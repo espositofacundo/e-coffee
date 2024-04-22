@@ -1,9 +1,7 @@
-import { titleFont } from '@/config/fonts';
-import Link from 'next/link';
-import { CgGoogle } from 'react-icons/cg';
+
 import { FcGoogle } from 'react-icons/fc';
 
-export default function () {
+export default function RegisterPage() {
   return (
     <div className="flex flex-col min-h-screen pt-20 sm:pt-30">
 

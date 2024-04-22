@@ -16,7 +16,7 @@ interface Props {
   };
 }
 
-export default function ({ params }: Props) {
+export default function ProductDetails({ params }: Props) {
   const { slug } = params;
   const product = allProducts.find((product) => product.slug === slug);
 
