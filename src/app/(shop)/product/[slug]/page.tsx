@@ -6,6 +6,7 @@ import SizeSelector from "@/components/product/size-selector/SizeSelector";
 import QuantitySelector from "@/components/product/quantity-selector/QuantitySelector";
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
 import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
+import Link from "next/link";
 
 const allProducts = initialData.products;
 
@@ -51,7 +52,13 @@ export default function ({ params }: Props) {
         <QuantitySelector
         quantity={2}
         />
-        <button className="btn-primary my-5">Agregar al carrito</button>
+
+        <button className="btn-primary my-5" >
+        <Link href="/cart">Agregar al carrito</Link>
+        </button>
+
+        
+        
         <h3 className="font-bold text-sm">Descripción</h3>
         <p className="font-light">{product.description}</p>
       </div>

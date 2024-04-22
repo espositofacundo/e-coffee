@@ -1,8 +1,13 @@
+import React from 'react'
 
-export default function () {
+const pageAdmin = () => {
   return (
     <div>
-      <h1>admin </h1>
+      
     </div>
-  );
+  )
 }
+
+export default pageAdmin
+
+
