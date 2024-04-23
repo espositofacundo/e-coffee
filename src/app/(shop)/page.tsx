@@ -29,7 +29,7 @@ export default async function Home({ searchParams }: Props) {
         <div>
           <Title
             title="Home"
-            subtitle="Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi"
+            subtitle="Lo mejor de lo nuestro"
           />
         </div>
         <div className="col-span-3 p-2 overflow-hidden">
@@ -44,8 +44,7 @@ export default async function Home({ searchParams }: Props) {
             <div>
               <div className="rounded-md overflow-hidden fade-in">
 
-                
-                
+              
                 <Image
                   src={`/products/${product.images[0]}`}
                   alt={product.title}
