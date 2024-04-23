@@ -79,7 +79,7 @@ const PageCart = () => {
                 className="flex btn-primary justify-center"
                 href="/orders/123"
               >
-                Confirmar pedido <CgCoffee className="w-6 h-6 ml-1" />
+              <CgCoffee className="w-6 h-6 mr-1" />  Confirmar pedido 
               </Link>
             </div>
             <div className="w-full h-px bg-gray-800 my-4 col-span-2" />

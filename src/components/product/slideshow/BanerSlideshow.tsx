@@ -80,6 +80,7 @@ const BanerSlideShowHome = () => {
             src="/imgs/backgroundimagne.jpg"
             alt="bannerDelicias"
             className="rounded-lg object-contain"
+            priority
           />
         </SwiperSlide>
         <SwiperSlide key="/imgs/banerdelicias.jpg">
@@ -89,6 +90,7 @@ const BanerSlideShowHome = () => {
             src="/imgs/banerdelicias.PNG"
             alt="bannerDelicias"
             className="rounded-lg object-contain"
+            priority
           />
         </SwiperSlide>
       </Swiper>

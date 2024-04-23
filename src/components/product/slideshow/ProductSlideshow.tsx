@@ -44,7 +44,7 @@ const ProductSlideshow = ({ images, title, className }: Props) => {
             images.map(images=>(
 
                 <SwiperSlide key={images}>
-                    <Image width={1024} height={800} src={`/products/${images}`} alt={title} className="rounded-lg object-fill"/>
+                    <Image width={1024} height={800} src={`/products/${images}`} alt={title} priority className="rounded-lg object-fill"/>
         
                 </SwiperSlide>
 

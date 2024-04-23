@@ -7,6 +7,7 @@ import QuantitySelector from "@/components/product/quantity-selector/QuantitySel
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
 import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
 import Link from "next/link";
+import { IoCartOutline } from "react-icons/io5";
 
 const allProducts = initialData.products;
 
@@ -33,7 +34,7 @@ export default function ProductDetails({ params }: Props) {
       <div className="col-span-1 md:col-span-2 ">
 
         
-        <ProductMobileSlideshow title={product.title} images={product.images} className="block md:hidden"/>
+        <ProductMobileSlideshow title={product.title} images={product.images} className="block md:hidden" />
         <ProductSlideshow title={product.title} images={product.images} className="hidden md:block"/>
         
       </div>
@@ -42,7 +43,7 @@ export default function ProductDetails({ params }: Props) {
           {" "}
           {product.title}
         </h1>
-        <p className="flex justify-center w-20  bg-green-200 text-center rounded-md">${product.price}</p>
+        <p className="flex justify-center w-fit bg-green-200 text-center rounded-md">${product.price}</p>
 
         <SizeSelector
           selectedSize={product.sizes[1]}
@@ -53,8 +54,9 @@ export default function ProductDetails({ params }: Props) {
         quantity={2}
         />
 
-        <button className="btn-primary my-5" >
-        <Link href="/cart">Agregar al carrito</Link>
+        <button className="btn-primary my-5 flex justify-center items-center" >
+        <IoCartOutline className="w-6 h-6 " />
+        <Link href="/cart" className="pl-2"> Agregar al carrito</Link>
         </button>
 
         
