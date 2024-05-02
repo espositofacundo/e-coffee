@@ -1,15 +1,16 @@
-import { initialData } from "@/interfaces";
+export const revalidate = 604800;
+
 import NotFound from "../../category/not-found";
 import { titleFont } from "@/config/fonts";
 
-import SizeSelector from "@/components/product/size-selector/SizeSelector";
-import QuantitySelector from "@/components/product/quantity-selector/QuantitySelector";
 import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
 import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
-import Link from "next/link";
-import { IoCartOutline } from "react-icons/io5";
 
-const allProducts = initialData.products;
+import { getProductbySlug } from "@/actions/products/get-product-by-slug";
+import StockLabel from "@/components/product/stock-label/StockLabel";
+import { Metadata, ResolvingMetadata } from "next";
+import AddToCart from "./ui/AddToCart";
+
 
 interface Props {
   params: {
@@ -17,14 +18,41 @@ interface Props {
   };
 }
 
-export default function ProductDetails({ params }: Props) {
+export async function generateMetadata(
+  { params }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  // read route params
+  const slug = params.slug;
+
+  // fetch data
+  const product = await getProductbySlug(slug);
+
+  // optionally access and extend (rather than replace) parent metadata
+  // const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: product?.title ?? "Producto no encontrado",
+    description: product?.description ?? "",
+
+    openGraph: {
+      title: product?.title ?? "Producto no encontrado",
+      description: product?.description ?? "",
+      images: [`/products/${product?.images[0]}`],
+    },
+  };
+}
+
+export default async function ProductDetails({ params }: Props) {
   const { slug } = params;
-  const product = allProducts.find((product) => product.slug === slug);
+  const product = await getProductbySlug(slug);
+  
+  
 
   if (!product) {
     return (
       <div>
-        <NotFound></NotFound>
+        <NotFound />
       </div>
     );
   }
@@ -32,37 +60,31 @@ export default function ProductDetails({ params }: Props) {
   return (
     <div className="mt-5 mb-20 grid md:grid-cols-3 gap-3">
       <div className="col-span-1 md:col-span-2 ">
-
-        
-        <ProductMobileSlideshow title={product.title} images={product.images} className="block md:hidden" />
-        <ProductSlideshow title={product.title} images={product.images} className="hidden md:block"/>
-        
+        <ProductMobileSlideshow
+          title={product.title}
+          images={product.images}
+          className="block md:hidden"
+        />
+        <ProductSlideshow
+          title={product.title}
+          images={product.images}
+          className="hidden md:block"
+        />
       </div>
       <div className="col-span-1 px-5 ">
         <h1 className={`${titleFont} antialiased font-bold text-xl uppercase`}>
-          {" "}
           {product.title}
         </h1>
-        <p className="flex justify-center w-fit bg-green-200 text-center rounded-md">${product.price}</p>
-
-        <SizeSelector
-          selectedSize={product.sizes[1]}
-          availableSizes={product.sizes}
-        />
-
-        <QuantitySelector
-        quantity={2}
-        />
-
-        <button className="btn-primary my-5 flex justify-center items-center" >
-        <IoCartOutline className="w-6 h-6 " />
-        <Link href="/cart" className="pl-2"> Agregar al carrito</Link>
-        </button>
-
+        <div className="flex items-center">
         
-        
+          <StockLabel slug={product.slug} />
+        </div>
+
+        <AddToCart product={product}/>
+
         <h3 className="font-bold text-sm">Descripción</h3>
         <p className="font-light">{product.description}</p>
+
       </div>
     </div>
   );

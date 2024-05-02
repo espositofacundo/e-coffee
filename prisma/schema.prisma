@@ -22,6 +22,11 @@ enum Rootcategory {
   delicias
 }
 
+enum Role {
+  admin
+  user
+}
+
 model Category {
   id      String    @id @default(uuid())
   name    String    @unique
@@ -42,6 +47,7 @@ model Product {
   category     Category       @relation(fields: [categoryId], references: [id])
   categoryId   String
   ProductImage ProductImage[]
+  OrderItem    OrderItem[]
 
   @@index([rootcategory])
 }
@@ -52,4 +58,71 @@ model ProductImage {
 
   product   Product @relation(fields: [productId], references: [id])
   productId String
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  emailVerified DateTime?
+  password      String
+  role          Role      @default(user)
+  Order         Order[]
+}
+
+//orden
+
+model Order {
+  id String @id @default(uuid())
+
+  subtotal Float
+  tax      Float
+  Delivery Float
+  total    Float
+
+  itemsInOrder Int
+
+  isPaid             Boolean
+  isOkforCook        Boolean
+  isReadyForDelivery Boolean
+  isDelivered        Boolean
+
+  DisPaid             DateTime?
+  DisOkforCook        DateTime?
+  DisReadyForDelivery DateTime?
+  DisDelivered        DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  //Relaciones
+  user           User          @relation(fields: [userId], references: [id])
+  userId         String
+  OrderItem      OrderItem[]
+  OrderAddress   OrderAddress?
+  orderAddressId String
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  quantity Int
+  price    Float
+  size     Size
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+}
+
+model OrderAddress {
+  id        String @id @default(uuid())
+  firstName String
+  address   String
+  phone     String
+
+  // relaciones
+
+  Order   Order  @relation(fields: [OrderID], references: [id])
+  OrderID String @unique
 }

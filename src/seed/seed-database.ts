@@ -3,13 +3,16 @@ import prisma from "../lib/prisma";
 
 async function main() {
   // aca estoy borrando todas la data previo
-  await Promise.all([
-    prisma.productImage.deleteMany(),
-    prisma.product.deleteMany(),
-    prisma.category.deleteMany(),
-  ]);
 
-  const { categories, products } = initialData;
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+
+  const { categories, products, users } = initialData;
+
+  await prisma.user.createMany({
+    data: users,
+  });
 
   //aca estaria agregando una categoria que se llama salado en la tabla Category :
 

@@ -25,7 +25,7 @@ export default async function Home({ searchParams }: Props) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-4 items-center bg-slate-200">
+      <div className="grid grid-cols-1 sm:grid-cols-4 items-center">
         <div>
           <Title
             title="Home"
@@ -33,7 +33,7 @@ export default async function Home({ searchParams }: Props) {
           />
         </div>
         <div className="col-span-3 p-2 overflow-hidden">
-          <BanerSlideShowHome></BanerSlideShowHome>
+          <BanerSlideShowHome/>
         </div>
       </div>
 

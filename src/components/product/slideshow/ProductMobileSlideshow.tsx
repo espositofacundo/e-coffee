@@ -44,6 +44,7 @@ const ProductMobileSlideshow = ({ images, title, className }: Props) => {
               src={`/products/${images}`}
               alt={title}
               className="object-fill"
+              priority
             />
           </SwiperSlide>
         ))}

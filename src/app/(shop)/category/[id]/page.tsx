@@ -39,10 +39,10 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   return (
     <>
       <div>
-        <div className="grid grid-cols-1 sm:grid-cols-4 items-center bg-slate-200">
+        <div className="grid grid-cols-1 sm:grid-cols-4 items-center">
           <div>
             <Title
-              title="Home"
+              title={`${id}`}
               subtitle="Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi"
             />
           </div>
