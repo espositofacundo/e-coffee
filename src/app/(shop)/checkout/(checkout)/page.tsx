@@ -6,7 +6,7 @@ import ProductsInCart from "./ui/ProductsInCart";
 import PlaceOrder from "./ui/PlaceOrder";
 import { FaCartShopping } from "react-icons/fa6";
 import Link from "next/link";
-import { TfiBackLeft } from "react-icons/tfi";
+
 
 const PageCart = () => {
   return (
@@ -27,15 +27,7 @@ const PageCart = () => {
               </Link>
             </div>
 
-            <div className="flex flex-col w-full  ">
-              <Link
-                href="/cart"
-                className="font-bold flex w-full underline justify-center "
-              >
-                <TfiBackLeft className="w-6 h-6 mr-3 " />
-                Upss! quiero ir a buscar mi pedido / Estoy sentado en una mesa.
-              </Link>
-            </div>
+           
           </div>
         </div>
       </div>

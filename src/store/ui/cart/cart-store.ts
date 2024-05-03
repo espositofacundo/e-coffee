@@ -17,6 +17,8 @@ interface State {
   addProductToCart: (product: CartProduct) => void;
   updateProductQuantity: (product: CartProduct, quantity: number) => void;
   removeProduct: (product: CartProduct) => void;
+
+  clearCart: () => void;
 }
 
 export const useCartStore = create<State>()(
@@ -35,20 +37,20 @@ export const useCartStore = create<State>()(
 
         const subTotal = cart.reduce((subtotal, product) => {
           let price = product.price;
-        
+
           // Ajustar el precio según el tamaño del producto
-          if (product.size === 'L') {
+          if (product.size === "L") {
             price *= 1.25; // Aumento del 25% para tamaño 'L'
-          } else if (product.size === 'S') {
+          } else if (product.size === "S") {
             price *= 0.8; // Reducción del 20% para tamaño 'S'
           }
-        
+
           return subtotal + product.quantity * price;
         }, 0);
 
         const delivery = 1000;
-        const tax = (subTotal)*0;
-        
+        const tax = subTotal * 0;
+
         const total = subTotal + tax;
         const itemsInCart = cart.reduce(
           (total, item) => total + item.quantity,
@@ -62,7 +64,6 @@ export const useCartStore = create<State>()(
           total,
           itemsInCart,
           totalWithDelivery,
-          
         };
       },
 
@@ -112,6 +113,10 @@ export const useCartStore = create<State>()(
           (item) => item.id !== product.id || item.size !== product.size
         );
         set({ cart: updatedCartProducts });
+      },
+
+      clearCart: () => {
+        set({ cart: [] });
       },
     }),
 

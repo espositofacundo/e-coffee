@@ -3,6 +3,7 @@
 import { useAddressStore } from "@/store/ui/address/address-store";
 import clsx from "clsx";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -19,6 +20,7 @@ type Forminputs = {
 };
 
 export const AddressForm = () => {
+  const router = useRouter();
   const {
     handleSubmit,
     register,
@@ -41,6 +43,7 @@ export const AddressForm = () => {
   const onSubmit = (data: Forminputs) => {
     const {campoboolean, ...restAddress } = data;
     setAddress(restAddress);
+    router.push('/checkout');
   
   };
   return (
@@ -146,18 +149,9 @@ export const AddressForm = () => {
           "btn-disabled": !isValid,
         })}
       >
-        <div className="flex justify-center"><IoSaveOutline size={19}></IoSaveOutline> <span className="pl-2">Guardar</span> </div>
+        <div className="flex justify-center"><IoSaveOutline size={19}></IoSaveOutline> <span className="pl-2">Confirmar dirección y Cel</span> </div>
       </button>
 
-
-     
-        
-        <button
-          className="btn-primary"
-          
-        >
-          <Link href='/checkout' className="flex justify-center"><IoArrowForwardCircleOutline size={25} ></IoArrowForwardCircleOutline> <span className="pl-2">Continuar</span> </Link>
-        </button>
       </div>
     </form>
   );

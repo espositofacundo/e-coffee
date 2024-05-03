@@ -8,6 +8,7 @@ import type {
   Size,
 } from "@/interfaces/product.interface";
 import { useCartStore } from "@/store/ui/cart/cart-store";
+import clsx from "clsx";
 
 import Link from "next/link";
 import React, { useState } from "react";
@@ -22,6 +23,7 @@ const AddToCart = ({ product }: Props) => {
 
   const [size, setSize] = useState<Size | undefined>("M");
   const [quantity, setQuantity] = useState<number>(1);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const addtocart = () => {
     if (!size) return;
@@ -40,6 +42,7 @@ const AddToCart = ({ product }: Props) => {
     addProductToCart(cartProduct);
     setQuantity(1);
     setSize("M");
+    setAddedToCart(true);
   };
 
   return (
@@ -63,7 +66,11 @@ const AddToCart = ({ product }: Props) => {
 
       <button
         onClick={addtocart}
-        className="btn-primary my-5 flex justify-center items-center"
+        className={clsx({
+          "btn-primary my-5 flex justify-center items-center": !addedToCart,
+          "hidden my-5": addedToCart,
+        })}
+       
         
       >
         <IoCartOutline className="w-6 h-6 " />

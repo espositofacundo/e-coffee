@@ -1,15 +1,22 @@
 "use client";
+
+import { placeOrder } from "@/actions/order/place-order";
 import { useAddressStore } from "@/store/ui/address/address-store";
 import { useCartStore } from "@/store/ui/cart/cart-store";
 import clsx from "clsx";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import React, { useEffect, useState } from "react";
+import { BsCartCheckFill } from "react-icons/bs";
 import { CgCoffee } from "react-icons/cg";
 
 import { GrEdit } from "react-icons/gr";
 
 const PlaceOrder = () => {
+  const router = useRouter()
   const [loaded, setLoaded] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isPlacingOrdern, setisPlacingOrdern] = useState(false);
 
   const address = useAddressStore((state) => state.address);
@@ -17,7 +24,8 @@ const PlaceOrder = () => {
   const { itemsInCart, subTotal, total, totalWithDelivery } = useCartStore(
     (state) => state.getSummaryInformation()
   );
-  const cart = useCartStore(state => state.cart)
+  const cart = useCartStore((state) => state.cart);
+  const clearCart = useCartStore((state) => state.clearCart);
 
   useEffect(() => {
     setLoaded(true);
@@ -26,16 +34,22 @@ const PlaceOrder = () => {
   const onPlaceOrder = async () => {
     setisPlacingOrdern(true);
 
-    const productsToOrder = cart.map( product => ({
+    const productsToOrder = cart.map((product) => ({
       productId: product.id,
       quantity: product.quantity,
       size: product.size,
+    }));
 
-    }))
+    const resp = await placeOrder(productsToOrder, address);
+    if (!resp.ok) {
+      setisPlacingOrdern(false);
+      setErrorMessage(resp.message);
+      return;
+    }
 
-    console.log({ address,productsToOrder });
-
-    setisPlacingOrdern(false);
+    clearCart();
+    router.push('/orders/'+resp.order?.id) // Navigate to /dashboard
+    
   };
 
   if (!loaded) {
@@ -95,19 +109,20 @@ const PlaceOrder = () => {
               : `mt-5 mb-2 w-full  `
           }
         >
-          {
-            //<p className="text-red-500">Error de creación</p>
-          }
+          <p className="text-red-500">{errorMessage}</p>
+
           <button
             onClick={onPlaceOrder}
             className={clsx({
               "btn-primary flex": !isPlacingOrdern,
               "btn-disabled flex": isPlacingOrdern,
+
             })}
           >
             <CgCoffee className="w-6 h-6 mr-1 " /> Confirmar Orden
           </button>
         </div>
+       
       </div>
     </>
   );
