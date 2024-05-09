@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import React, { useEffect, useState } from "react";
-import { BsCartCheckFill } from "react-icons/bs";
 import { CgCoffee } from "react-icons/cg";
 
 import { GrEdit } from "react-icons/gr";

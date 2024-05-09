@@ -3,13 +3,13 @@ import prisma from "../lib/prisma";
 
 async function main() {
   // aca estoy borrando todas la data previo
- // await prisma.orderAddress.deleteMany();
- // await prisma.orderItem.deleteMany();
- // await prisma.order.deleteMany();
- // await prisma.user.deleteMany();
- // await prisma.productImage.deleteMany();
- // await prisma.product.deleteMany();
- // await prisma.category.deleteMany();
+ 
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
 
   const { categories, products, users } = initialData;
 

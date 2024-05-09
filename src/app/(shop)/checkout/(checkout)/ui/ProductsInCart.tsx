@@ -9,7 +9,7 @@ const ProductsInCart = () => {
 
   useEffect(() => {
     setLoaded(true);
-  });
+  },[]);
 
   const productsInCartCheckout = useCartStore((state) => state.cart);
   if (!loaded) {

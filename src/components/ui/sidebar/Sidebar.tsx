@@ -73,7 +73,8 @@ const Sidebar = () => {
               <span className="ml-3 text-xl">Perfil</span>
             </Link>
             <Link
-              href="/"
+              href="/orders"
+              onClick={() => closeMenu()}
               className="flex items-center mt-5 sm:mt-10 p-1 hover:bg-gray-100 rounded transition-all"
             >
               <IoTicketOutline size={30} />
@@ -107,22 +108,25 @@ const Sidebar = () => {
           <>
             <div className="w-full h-px bg-gray-200 mt-5 sm:my-10" />
             <Link
-              href="/"
+              href="/admin/products"
               className="flex items-center mt-5 sm:mt-10 p-1 hover:bg-gray-100 rounded transition-all"
+              onClick={() => closeMenu()}
             >
               <IoShirtOutline size={30} />
               <span className="ml-3 text-xl">Productos</span>
             </Link>
             <Link
-              href="/"
+              href="/admin/orders"
               className="flex items-center mt-5 sm:mt-10 p-1 hover:bg-gray-100 rounded transition-all"
+              onClick={() => closeMenu()}
             >
               <IoTicketOutline size={30} />
               <span className="ml-3 text-xl">Ordenes</span>
             </Link>
             <Link
-              href="/"
+              href="/admin/users"
               className="flex items-center mt-5 sm:mt-10 p-1 hover:bg-gray-100 rounded transition-all"
+              onClick={() => closeMenu()}
             >
               <IoPeopleOutline size={30} />
               <span className="ml-3 text-xl">Usuarios</span>

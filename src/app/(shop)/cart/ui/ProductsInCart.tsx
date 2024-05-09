@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useCartStore } from "@/store/ui/cart/cart-store";
 import React, { useEffect, useState } from "react";
 
 import QuantitySelector from "@/components/product/quantity-selector/QuantitySelector";
 import { FaTrashRestore } from "react-icons/fa";
 import Link from "next/link";
+import ProductImage from "@/components/product/product-image/productImage";
 
 const ProductsInCart = () => {
 
@@ -21,7 +21,7 @@ const ProductsInCart = () => {
 
   useEffect(() => {
     setLoaded(true);
-  });
+  },[]);
 
   const productsInCart = useCartStore((state) => state.cart);
   if (!loaded) {
@@ -35,10 +35,15 @@ const ProductsInCart = () => {
           key={`${product.slug}-${product.size}`}
           className="flex  my-4 bg-blue-100 shadow-xl "
         >
-          <Image
-            src={`/products/${product.image}`}
+          
+          <ProductImage
+            src={product.image}
             width={100}
             height={100}
+            style={{
+              width:"100px",
+              height:"100px",
+            }}
             alt={product.title}
             className="mr-5 rounded"
           />

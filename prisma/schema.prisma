@@ -27,6 +27,14 @@ enum Role {
   user
 }
 
+enum metodoDePago {
+  efectivo
+  transaccionbancaria
+  mp
+}
+
+
+
 model Category {
   id      String    @id @default(uuid())
   name    String    @unique
@@ -102,6 +110,9 @@ model Order {
   firstName   String?
   address     String?
   phone       String?
+
+  transactionId String?
+  metodoDePago  metodoDePago?
 }
 
 model OrderItem {

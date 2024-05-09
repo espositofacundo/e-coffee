@@ -13,6 +13,7 @@ import "swiper/css/navigation";
 import "./slideshow.css";
 import { Autoplay, FreeMode, Navigation } from "swiper/modules";
 import Image from "next/image";
+import ProductImage from "../product-image/productImage";
 
 interface Props {
   images: string[];
@@ -38,13 +39,14 @@ const ProductMobileSlideshow = ({ images, title, className }: Props) => {
       >
         {images.map((images) => (
           <SwiperSlide key={images}>
-            <Image
+         
+            <ProductImage
               width={600}
               height={500}
-              src={`/products/${images}`}
+              src={images}
               alt={title}
               className="object-fill"
-              priority
+            
             />
           </SwiperSlide>
         ))}
