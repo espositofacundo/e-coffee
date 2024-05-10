@@ -58,7 +58,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
                 <div>
                   <div className="rounded-md overflow-hidden fade-in">
                     <Image
-                      src={`/products/${product.images[0]}`}
+                      src={product.images[0]}
                       alt={product.title}
                       className="w-full object-cover"
                       width={500}
