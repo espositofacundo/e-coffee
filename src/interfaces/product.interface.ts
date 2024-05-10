@@ -35,4 +35,4 @@ export interface Address {
 
 export type Category = "coffee" | "delicias";
 export type Size = "XS" | "S" | "M" | "L" | "XL" | "XXL" | "XXXL";
-export type Type = "salado" | "dulce" | "infusiones" | "bebidas" | "saludable";
+export type Type = "Cafeteria" | "Desayunos" | "Batidos" | "Licuados" | "Tostadas" | "Pasteleria" | "Sandwiches" | "Wraps" | "Tartas" | "Ensaladas" | "Principales" | "Postres" | "Bebidas" | "Promociones";

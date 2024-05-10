@@ -17,12 +17,12 @@ async function main() {
     data: users,
   });
 
-  //aca estaria agregando una categoria que se llama salado en la tabla Category :
+  //aca estaria agregando una categoria que se llama  en la tabla Category :
 
   /*
   await prisma.category.create({
     data:{
-        name : 'Salado',
+        name : '',
     }
   })
 */
