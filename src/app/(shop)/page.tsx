@@ -37,22 +37,21 @@ export default async function Home({ searchParams }: Props) {
         {products.map((product) => (
           <>
             <Link href={`/product/${product.slug}`}>
-              <div>
-                <div className="rounded-md overflow-hidden fade-in">
-                  <Image
-                    src={product.images[0]}
-                    alt={product.title}
-                    className="w-full h-full object-cover"
-                    width={500}
-                    height={500}
-                  />
-                </div>
-                <div className="p-4 flex flex-col">
-                  <span className="hover:text-blue-600">{product.title}</span>
-                  <span className="font-bold">${product.price}</span>
-                </div>
-              </div>
-            </Link>
+  <a className="block">
+    <div className="rounded-md overflow-hidden fade-in" style={{ width: '500px', height: '500px' }}>
+      <Image
+        src={product.images[0]}
+        alt={product.title}
+        className="w-full h-full object-cover"
+        layout="fill"
+      />
+    </div>
+    <div className="p-4 flex flex-col">
+      <span className="hover:text-blue-600">{product.title}</span>
+      <span className="font-bold">${product.price}</span>
+    </div>
+  </a>
+</Link>
           </>
         ))}
       </div>
