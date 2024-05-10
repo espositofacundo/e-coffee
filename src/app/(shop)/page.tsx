@@ -46,7 +46,7 @@ export default async function Home({ searchParams }: Props) {
 
               
                 <Image
-                  src={`/products/${product.images[0]}`}
+                  src={product.images[0]}
                   alt={product.title}
                   className="w-full object-cover"
                   width={500}
