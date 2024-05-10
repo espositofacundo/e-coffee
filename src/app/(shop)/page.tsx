@@ -40,7 +40,7 @@ export default async function Home({ searchParams }: Props) {
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-10 mb-10">
         {products.map((product) => (
           <>
-         
+          <Link href={`/product/${product.slug}`}>
             <div>
               <div className="rounded-md overflow-hidden fade-in">
 
@@ -54,7 +54,6 @@ export default async function Home({ searchParams }: Props) {
                 />
                 
               </div>
-              <Link href={`/product/${product.slug}`}>
               <div className="p-4 flex flex-col">
                 <span
                  
@@ -64,9 +63,8 @@ export default async function Home({ searchParams }: Props) {
                 </span>
                 <span className="font-bold">${product.price}</span>
               </div>
-              </Link>
             </div>
-            
+            </Link>
                 
 
 
