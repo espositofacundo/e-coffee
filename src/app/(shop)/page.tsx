@@ -42,7 +42,7 @@ export default async function Home({ searchParams }: Props) {
           <>
           <Link href={`/product/${product.slug}`}>
             <div>
-              <div className="rounded-md overflow-hidden fade-in h-24 ">
+              <div className="rounded-md overflow-hidden fade-in h-2/3 ">
 
               
                 <Image
