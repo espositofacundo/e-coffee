@@ -15,59 +15,44 @@ interface Props {
 
 export default async function Home({ searchParams }: Props) {
   const page = searchParams.page ? parseInt(searchParams.page) : 1;
-  const { products,currentPage,totalPages } = await getPaginatedProductsWithImages({ page });
-  
-
+  const { products, currentPage, totalPages } =
+    await getPaginatedProductsWithImages({ page });
 
   if (products.length === 0) {
-    redirect('/');
+    redirect("/");
   }
 
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-4 items-center">
         <div>
-          <Title
-            title="Home"
-            subtitle="Lo mejor de lo nuestro"
-          />
+          <Title title="Home" subtitle="Lo mejor de lo nuestro" />
         </div>
         <div className="col-span-3 p-2 overflow-hidden">
-          <BanerSlideShowHome/>
+          <BanerSlideShowHome />
         </div>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-10 mb-10">
         {products.map((product) => (
           <>
-          <Link href={`/product/${product.slug}`}>
-            <div>
-              <div className="rounded-md overflow-hidden fade-in">
-
-              
-                <Image
-                  src={product.images[0]}
-                  alt={product.title}
-                  className="w-full object-fill"
-                  width={500}
-                  height={500}
-                />
-                
+            <Link href={`/product/${product.slug}`}>
+              <div>
+                <div className="rounded-md overflow-hidden fade-in">
+                  <Image
+                    src={product.images[0]}
+                    alt={product.title}
+                    className="w-full h-full object-cover"
+                    width={500}
+                    height={500}
+                  />
+                </div>
+                <div className="p-4 flex flex-col">
+                  <span className="hover:text-blue-600">{product.title}</span>
+                  <span className="font-bold">${product.price}</span>
+                </div>
               </div>
-              <div className="p-4 flex flex-col">
-                <span
-                 
-                  className="hover:text-blue-600"
-                >
-                  {product.title}
-                </span>
-                <span className="font-bold">${product.price}</span>
-              </div>
-            </div>
             </Link>
-                
-
-
           </>
         ))}
       </div>
