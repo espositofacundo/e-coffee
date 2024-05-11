@@ -56,7 +56,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <>
               <Link href={`/product/${product.slug}`}>
                 <div>
-                  <div className="rounded-md overflow-hidden fade-in">
+                  <div className="rounded-md overflow-hidden fade-in h-32 sm:h-80">
                     <Image
                       src={product.images[0]}
                       alt={product.title}
