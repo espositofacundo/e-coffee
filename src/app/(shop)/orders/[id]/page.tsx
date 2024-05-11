@@ -1,6 +1,7 @@
 export const revalidate = 0;
 import { getOrderById } from "@/actions/order/get-order-by-id";
 import Title from "@/components/ui/title/Title";
+import { format } from 'date-fns';
 
 import clsx from "clsx";
 import Image from "next/image";
@@ -69,7 +70,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-gray-500">
                     <FaCashRegister size={30}></FaCashRegister>
                     <span className="mx-2">
-                      Esperamos el pago para tomar tu pedido
+                      Orden confirmada: {order.createdAt ? format(new Date(order.createdAt), "HH:mm:ss - dd/MM ") : '-'}
                     </span>
                   </div>
                 </>
@@ -148,20 +149,18 @@ export default async function OrdersByIdPage({ params }: Props) {
                   className="flex  my-4 bg-white rounded-xl shadow-xl "
                 >
                   <ProductImage
-            src={product.product.ProductImage[0].url}
-            width={100}
-            height={100}
-            style={{
-              width:"auto",
-              height:"full",
-              objectFit:'cover'
-              
-   
-            }}
-            alt={product.product.title}
-            className="mr-5 rounded"
-            priority={true}   
-          />
+                    src={product.product.ProductImage[0].url}
+                    width={100}
+                    height={100}
+                    style={{
+                      width: "auto",
+                      height: "full",
+                      objectFit: "cover",
+                    }}
+                    alt={product.product.title}
+                    className="mr-5 rounded"
+                    priority={true}
+                  />
                   <div className="w-full">
                     <p className="font-bold">{product.product.title}</p>
                     <p>
