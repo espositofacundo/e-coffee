@@ -10,6 +10,7 @@ import { getProductbySlug } from "@/actions/products/get-product-by-slug";
 import StockLabel from "@/components/product/stock-label/StockLabel";
 import { Metadata, ResolvingMetadata } from "next";
 import AddToCart from "./ui/AddToCart";
+import PageNotFound from "../../category/not-found";
 
 
 interface Props {
@@ -52,7 +53,7 @@ export default async function ProductDetails({ params }: Props) {
   if (!product) {
     return (
       <div>
-        <NotFound />
+        <PageNotFound></PageNotFound>
       </div>
     );
   }
