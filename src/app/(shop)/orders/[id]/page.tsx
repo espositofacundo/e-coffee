@@ -15,6 +15,7 @@ import { MdOutlineDeliveryDining } from "react-icons/md";
 
 import { TbChefHat } from "react-icons/tb";
 import PaymentMethods from "../../checkout/payment/paymentMethod";
+import ProductImage from "@/components/product/product-image/productImage";
 
 interface Props {
   params: {
@@ -144,15 +145,23 @@ export default async function OrdersByIdPage({ params }: Props) {
               {order?.OrderItem.map((product) => (
                 <div
                   key={product.product.slug}
-                  className="flex  my-4 bg-blue-100 shadow-xl "
+                  className="flex  my-4 bg-white rounded-xl shadow-xl "
                 >
-                  <Image
-                    src={`/products/${product.product.ProductImage[0].url}`}
-                    width={100}
-                    height={100}
-                    alt={product.product.title}
-                    className="mr-5 rounded"
-                  />
+                  <ProductImage
+            src={product.product.ProductImage[0].url}
+            width={100}
+            height={100}
+            style={{
+              width:"auto",
+              height:"full",
+              objectFit:'cover'
+              
+   
+            }}
+            alt={product.product.title}
+            className="mr-5 rounded"
+            priority={true}   
+          />
                   <div className="w-full">
                     <p className="font-bold">{product.product.title}</p>
                     <p>
