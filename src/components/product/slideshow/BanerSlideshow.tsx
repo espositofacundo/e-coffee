@@ -34,17 +34,17 @@ const BanerSlideShowHome = () => {
         spaceBetween={10}
         navigation={true}
         autoplay={{
-          delay: 2500,
+          delay: 5000,
         }}
         thumbs={{ swiper: thumbsSwiper }}
         modules={[FreeMode, Navigation, Thumbs, Autoplay]}
         className="mySwiper2"
       >
-        <SwiperSlide key="/imgs/backgroundimagne.jpg">
+        <SwiperSlide key="/imgs/nuevobanner.jpg">
           <Image
             width={1024}
             height={800}
-            src="/imgs/backgroundimagne.jpg"
+            src="/imgs/nuevobanner.jpg"
             alt="bannerDelicias"
             className="rounded-lg object-contain"
             
@@ -64,36 +64,7 @@ const BanerSlideShowHome = () => {
           />
         </SwiperSlide>
       </Swiper>
-      <Swiper
-        onSwiper={setThumbsSwiper}
-        spaceBetween={10}
-        slidesPerView={4}
-        freeMode={true}
-        watchSlidesProgress={true}
-        modules={[FreeMode, Navigation, Thumbs]}
-        className="mySwiper"
-      >
-        <SwiperSlide key="/imgs/backgroundimagne.jpg">
-          <Image
-            width={1024}
-            height={800} 
-            src="/imgs/backgroundimagne.jpg"
-            alt="bannerDelicias"
-            className="rounded-lg object-contain"
-            priority
-          />
-        </SwiperSlide>
-        <SwiperSlide key="/imgs/banerdelicias.jpg">
-          <Image
-            width={1024}
-            height={800} 
-            src="/imgs/banerdelicias.PNG"
-            alt="bannerDelicias"
-            className="rounded-lg object-contain"
-            priority
-          />
-        </SwiperSlide>
-      </Swiper>
+     
     </div>
   );
 };

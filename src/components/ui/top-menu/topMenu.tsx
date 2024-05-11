@@ -28,26 +28,10 @@ const TopMenu = () => {
           <span className="bg-green-200 p-1 rounded">E-coffee</span>
         </Link>
       </div>
-      <div className="hidden sm:block">
-        <Link
-          href="/category/coffee"
-          className="m-2 px-4 rounded-md transition-all hover:bg-gray-100 font-bold text-xl"
-        >
-          Coffee
-        </Link>
-
-        <Link
-          href="/category/delicias"
-          className="m-2 px-4 rounded-md transition-all hover:bg-gray-100 font-bold text-xl "
-        >
-          Nuestras delicias
-        </Link>
-      </div>
+      
 
       <div className="flex items-center">
-        <Link href="/search">
-          <IoSearchOutline className="w-6 h-6" />
-        </Link>
+        
         <Link href="/cart" className="mx-2">
           <div className="relative">
             {(loaded && totalItemsincart > 0) && (
