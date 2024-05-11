@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCartStore } from "@/store/ui/cart/cart-store";
 import React, { useEffect, useState } from "react";
+import ProductImage from "@/components/product/product-image/productImage";
 
 const ProductsInCart = () => {
   const [loaded, setLoaded] = useState(false);
@@ -21,14 +22,22 @@ const ProductsInCart = () => {
       {productsInCartCheckout.map((product) => (
         <div
           key={`${product.slug}-${product.size}`}
-          className="flex  my-4 bg-blue-100 shadow-xl "
+          className="flex  my-4 bg-white rounded-xl shadow-xl "
         >
-          <Image
-            src={`/products/${product.image}`}
+           <ProductImage
+            src={product.image}
             width={100}
             height={100}
+            style={{
+              width:"auto",
+              height:"full",
+              objectFit:'cover'
+              
+   
+            }}
             alt={product.title}
             className="mr-5 rounded"
+            priority={true}   
           />
           <div className="w-full">
             <span>

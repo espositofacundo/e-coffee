@@ -33,7 +33,7 @@ const ProductsInCart = () => {
       {productsInCart.map((product) => (
         <div
           key={`${product.slug}-${product.size}`}
-          className="flex  my-4 bg-blue-100 shadow-xl "
+          className="flex  my-4 bg-white rounded-xl shadow-xl "
         >
           
           <ProductImage
@@ -41,11 +41,15 @@ const ProductsInCart = () => {
             width={100}
             height={100}
             style={{
-              width:"100px",
-              height:"100px",
+              width:"auto",
+              height:"full",
+              objectFit:'cover'
+              
+   
             }}
             alt={product.title}
             className="mr-5 rounded"
+            priority={true}   
           />
           <div className="w-full">
             <Link

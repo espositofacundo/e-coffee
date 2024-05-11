@@ -149,7 +149,7 @@ export const AddressForm = () => {
           "btn-disabled": !isValid,
         })}
       >
-        <div className="flex justify-center"><IoSaveOutline size={19}></IoSaveOutline> <span className="pl-2">Confirmar dirección y Cel</span> </div>
+        <div className="flex justify-center"><IoSaveOutline size={19}></IoSaveOutline> <span className="pl-2">Continuar</span> </div>
       </button>
 
       </div>
