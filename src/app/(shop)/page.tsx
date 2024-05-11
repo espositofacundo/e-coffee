@@ -58,7 +58,7 @@ export default function Home({ searchParams }: Props) {
             <BanerSlideShowHome />
           </div>
 
-          <div className="flex gap-2 p-4">
+          <div className="flex gap-3 flex-wrap p-4">
             <button className="btn-categories font-bold"  onClick={() => handleCategoryChange(null)}>Mostrar Todas</button>
             <button className="btn-categories" onClick={() => handleCategoryChange("2768b5c1-07e1-469a-a855-218dbc186ce2")}>Cafeteria</button>
             <button className="btn-categories"  onClick={() => handleCategoryChange("0e94ad77-a50d-4c7b-a653-3e3727fede58")}>Desayunos & Meriendas</button>
