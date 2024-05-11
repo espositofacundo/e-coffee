@@ -72,5 +72,5 @@ body {
 }
 
 .btn-categories {
-  @apply bg-black hover:bg-gray-800 text-white py-2 px-4  transition-all;
+  @apply bg-black hover:bg-gray-700 text-white py-2 px-4  transition-all;
 }
