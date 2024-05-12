@@ -46,15 +46,8 @@ const Sidebar = () => {
           }
         )}
       >
-        <div className="flex justify-between">
-          <div className="relative w-full">
-            <IoSearchOutline size={24} className="absolute top-2 left-2 " />
-            <input
-              type="text"
-              placeholder="Buscar"
-              className="w-11/12 bg-blue-100 rounded pl-10 py-1 pr-10 border-b-2 text-xl border-gray-200 focus:outline-none focus:border-blue-500"
-            />
-          </div>
+        <div className="flex justify-end">
+          
           <IoCloseOutline
             size={40}
             className="    cursor-pointer mr-1 sm:mr-4 bg-red-200  rounded"

@@ -75,3 +75,10 @@ body {
   @apply bg-black hover:bg-gray-700 text-white py-2 px-4  transition-all;
 }
 
+
+.image-container {
+  position: relative;
+  width: 100%; /* Asegura que ocupa todo el ancho del contenedor padre */
+  height: 300px; /* O cualquier altura que se ajuste a tu diseño */
+}
+
