@@ -6,6 +6,7 @@ import { IoCartOutline, IoSearchOutline } from "react-icons/io5";
 import { UseUiStore } from "@/store/ui/ui-store";
 import { CgCoffee } from "react-icons/cg";
 import { useCartStore } from "@/store/ui/cart/cart-store";
+import { IoMdMenu } from "react-icons/io";
 
 const TopMenu = () => {
   const openSideMenu = UseUiStore((state) => state.openSideMenu);
@@ -45,9 +46,9 @@ const TopMenu = () => {
         </Link>
         <button
           onClick={openSideMenu}
-          className="m-2 p-2 rounded-md transition-all bg-gray-100 font-bold"
+          className="m-2 p-1 rounded-md transition-all bg-gray-100 font-bold"
         >
-          Menu
+          <IoMdMenu size={25} />
         </button>
       </div>
     </nav>

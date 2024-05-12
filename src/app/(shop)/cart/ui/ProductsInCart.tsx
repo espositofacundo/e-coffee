@@ -33,7 +33,7 @@ const ProductsInCart = () => {
       {productsInCart.map((product) => (
         <div
           key={`${product.slug}-${product.size}`}
-          className="flex  my-4 bg-white rounded-xl shadow-xl "
+          className="flex max-h-32 my-4 bg-white rounded-xl shadow-xl "
         >
           
           <ProductImage
