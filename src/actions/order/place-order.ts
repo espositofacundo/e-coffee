@@ -54,8 +54,13 @@ export const placeOrder = async (
 
   let Delivery = 0;
 
-  if (address.address !== "") {
-    Delivery = 1500; // No uses 'const' aquí para actualizar la variable externa
+  if (address.address === "1" ||
+            address.address === "2" ||
+            address.address === "3" ||
+            address.address === "4") {
+    Delivery = 0; // No uses 'const' aquí para actualizar la variable externa
+  }else{
+    Delivery = 1500
   }
 
   const subtotaldelivery = subTotal + Delivery;

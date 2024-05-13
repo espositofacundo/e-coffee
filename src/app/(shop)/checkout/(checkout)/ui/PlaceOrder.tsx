@@ -13,7 +13,7 @@ import { CgCoffee } from "react-icons/cg";
 import { GrEdit } from "react-icons/gr";
 
 const PlaceOrder = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [loaded, setLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isPlacingOrdern, setisPlacingOrdern] = useState(false);
@@ -47,8 +47,7 @@ const PlaceOrder = () => {
     }
 
     clearCart();
-    router.push('/orders/'+resp.order?.id) // Navigate to /dashboard
-    
+    router.push("/orders/" + resp.order?.id); // Navigate to /dashboard
   };
 
   if (!loaded) {
@@ -63,10 +62,21 @@ const PlaceOrder = () => {
         <div className="mb-4 grid grid-cols-2">
           <p>Nombre:</p>
           <p className="text-right">{address.firstName}</p>
-          <p>Direcció de entrega:</p>
+
+          <p>
+            {address.address === "1" ||
+            address.address === "2" ||
+            address.address === "3" ||
+            address.address === "4"
+              ? `N° de mesa:`
+              : "Direccion:"}{" "}
+          </p>
           <p className="text-right">
-            {address.address === ""
-              ? "Para consumir en el local"
+            {address.address === "1" ||
+            address.address === "2" ||
+            address.address === "3" ||
+            address.address === "4"
+              ? `Mesa ${address.address}`
               : address.address}
           </p>
           <p>Celular:</p>
@@ -91,14 +101,30 @@ const PlaceOrder = () => {
 
           <span>Subtotal</span>
           <span className="text-right">${subTotal}</span>
-          <span className="">Delivery:</span>
-          <span className="text-right">
-            ${address.address === "" ? "0" : totalWithDelivery - total}
-          </span>
+          {address.address === "1" ||
+          address.address === "2" ||
+          address.address === "3" ||
+          address.address === "4" ? (
+            <></>
+          ) : (
+            <>
+              {" "}
+              <span className="">Delivery:</span>
+              <span className="text-right">
+                {totalWithDelivery - total}
+              </span>{" "}
+            </>
+          )}
 
           <span className="mt-2 text-2xl">Total:</span>
           <span className="mt-2 text-2xl text-right">
-            ${address.address === "" ? total : totalWithDelivery}
+            $
+            {address.address === "1" ||
+            address.address === "2" ||
+            address.address === "3" ||
+            address.address === "4"
+              ? total
+              : totalWithDelivery}
           </span>
         </div>
         <div
@@ -115,13 +141,11 @@ const PlaceOrder = () => {
             className={clsx({
               "btn-primary flex": !isPlacingOrdern,
               "btn-disabled flex": isPlacingOrdern,
-
             })}
           >
             <CgCoffee className="w-6 h-6 mr-1 " /> Confirmar Orden
           </button>
         </div>
-       
       </div>
     </>
   );

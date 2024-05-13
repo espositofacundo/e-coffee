@@ -5,11 +5,9 @@ import { format } from "date-fns";
 
 import clsx from "clsx";
 
-
 import { redirect } from "next/navigation";
 
 import { BsFillCartCheckFill } from "react-icons/bs";
-
 
 import { IoCardOutline } from "react-icons/io5";
 import { MdOutlineDeliveryDining } from "react-icons/md";
@@ -70,8 +68,6 @@ export default async function OrdersByIdPage({ params }: Props) {
                     </svg>
                   </div>
 
-                  
-
                   <p className="text-xs mt-2">
                     {" "}
                     {order.createdAt
@@ -90,10 +86,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisOkforCook
-                      ? format(
-                          new Date(order.DisOkforCook),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisOkforCook), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -126,10 +119,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisDelivered
-                      ? format(
-                          new Date(order.DisDelivered),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisDelivered), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -180,10 +170,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisOkforCook
-                      ? format(
-                          new Date(order.DisOkforCook),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisOkforCook), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -216,10 +203,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisDelivered
-                      ? format(
-                          new Date(order.DisDelivered),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisDelivered), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -270,10 +254,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisOkforCook
-                      ? format(
-                          new Date(order.DisOkforCook),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisOkforCook), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -306,10 +287,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisDelivered
-                      ? format(
-                          new Date(order.DisDelivered),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisDelivered), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -360,10 +338,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.DisOkforCook
-                      ? format(
-                          new Date(order.DisOkforCook),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisOkforCook), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -395,10 +370,7 @@ export default async function OrdersByIdPage({ params }: Props) {
 
                   <p className="text-xs mt-2">
                     {order.DisDelivered
-                      ? format(
-                          new Date(order.DisDelivered),
-                          "HH:mm dd-MM"
-                        )
+                      ? format(new Date(order.DisDelivered), "HH:mm dd-MM")
                       : "-"}
                   </p>
                 </div>
@@ -408,8 +380,44 @@ export default async function OrdersByIdPage({ params }: Props) {
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-            <div className="flex flex-col mt-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 pt-10 gap-10">
+            <div className="flex flex-col ">
+              {order?.OrderItem.map((product) => (
+                <div
+                  key={product.product.slug}
+                  className="flex bg-white rounded-xl shadow-2xl"
+                >
+                  <ProductImage
+                    src={product.product.ProductImage[0].url}
+                    width={100}
+                    height={100}
+                    style={{
+                      width: "auto",
+                      height: "full",
+                      objectFit: "cover",
+                    }}
+                    alt={product.product.title}
+                    className="mr-5 rounded"
+                    priority={true}
+                  />
+                  <div className="w-full">
+                    <p className="font-bold">{product.product.title}</p>
+                    <p>
+                      ${product.price} x {product.quantity}{" "}
+                    </p>
+                    <p className="font-bold w-1/2">
+                      Subtotal: ${product.price * product.quantity}
+                    </p>
+
+                    <div className="flex justify-between p-4">
+                      <button className="pr-2"></button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-xl shadow-xl p-7 h-fit">
               <div
                 className={clsx(
                   "flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5",
@@ -431,49 +439,30 @@ export default async function OrdersByIdPage({ params }: Props) {
                   </span>
                 </div>
               </div>
+              <h2 className="text-2xl mb-2">Datos de la orden</h2>
 
-              {order?.OrderItem.map((product) => (
-                <div
-                  key={product.product.slug}
-                  className="flex  my-4 bg-white rounded-xl shadow-xl "
-                >
-                  <ProductImage
-                    src={product.product.ProductImage[0].url}
-                    width={100}
-                    height={100}
-                    style={{
-                      width: "auto",
-                      height: "full",
-                      objectFit: "cover",
-                    }}
-                    alt={product.product.title}
-                    className="mr-5 rounded"
-                    priority={true}
-                  />
-                  <div className="w-full">
-                    <p className="font-bold">{product.product.title}</p>
-                    <p>
-                      ${product.price} x {product.quantity}{" "}
-                    </p>
-                    <p className="font-bold bg-green-200 w-1/2">
-                      Subtotal: ${product.price * product.quantity}
-                    </p>
+              <div className="mb-4 grid grid-cols-2">
+                <p>Nombre:</p>
+                <p className="text-right">{order.firstName}</p>
 
-                    <div className="flex justify-between p-4">
-                      <button className="pr-2"></button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-white rounded-xl shadow-xl p-7 h-fit">
-              <h2 className="text-2xl mb-2">Dirección de entrega</h2>
-
-              <div className="mb-4">
-                <p>{order?.firstName}</p>
-                <p>{order?.address}</p>
-                <p>{order?.phone}</p>
+                <p>
+                  {order.address === "1" ||
+                  order.address === "2" ||
+                  order.address === "3" ||
+                  order.address === "4"
+                    ? `N° de mesa:`
+                    : "Direccion:"}{" "}
+                </p>
+                <p className="text-right">
+                  {order.address === "1" ||
+                  order.address === "2" ||
+                  order.address === "3" ||
+                  order.address === "4"
+                    ? `Mesa ${order.address}`
+                    : order.address}
+                </p>
+                <p>Celular:</p>
+                <p className="text-right">{order.phone}</p>
               </div>
 
               <div className="w-full h-px bg-gray-200 my-4 col-span-2" />
@@ -486,14 +475,14 @@ export default async function OrdersByIdPage({ params }: Props) {
                 <span>Subtotal</span>
                 <span className="text-right">${order?.subtotal}</span>
 
-                {
-                  order?.Delivery !== 0 ? <><span>Delivery</span>
-                  <span className="text-right">${order?.Delivery}</span></>
-                  :<></>
-                }
-                
-
-               
+                {order?.Delivery !== 0 ? (
+                  <>
+                    <span>Delivery</span>
+                    <span className="text-right">${order?.Delivery}</span>
+                  </>
+                ) : (
+                  <></>
+                )}
 
                 <div className="w-full h-px bg-gray-200 my-4 col-span-2" />
 
