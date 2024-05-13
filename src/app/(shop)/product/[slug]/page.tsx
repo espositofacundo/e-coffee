@@ -76,10 +76,12 @@ export default async function ProductDetails({ params }: Props) {
         <h1 className={`${titleFont} antialiased font-bold text-xl uppercase`}>
           {product.title}
         </h1>
-        <div className="flex items-center">
+
+        {/*  <div className="flex items-center">
         
-          <StockLabel slug={product.slug} />
-        </div>
+           <StockLabel slug={product.slug} />
+        </div> */}
+        
 
         <AddToCart product={product}/>
 

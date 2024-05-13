@@ -125,12 +125,12 @@ export default function Home({ searchParams }: Props) {
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
-              <div className="p-4 bg-black rounded-b-lg flex flex-col">
-                <span className="text-lg font-semibold text-white hover:underline">
+              <div className="p-4 bg-gray-950 rounded-b-lg flex flex-col">
+                <span className="text-lg h-14 font-semibold text-gray-100 hover:underline">
                   {product.title}
                 </span>
-                <span className="text-xl font-bold text-gray-500">
-                  ${product.price}
+                <span className="text-lg font-bold text-gray-300">
+                  $ {product.price}
                 </span>
               </div>
             </div>

@@ -21,7 +21,7 @@ const ProductsInCart = () => {
       {productsInCartCheckout.map((product) => (
         <div
           key={`${product.slug}-${product.size}`}
-          className="flex max-h-20 my-4 bg-white rounded-xl shadow-xl "
+          className="flex max-h-24 my-4 bg-white rounded-xl shadow-xl "
         >
            <ProductImage
             src={product.image}

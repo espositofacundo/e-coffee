@@ -1,16 +1,16 @@
-export const revalidate = 0;
+export const revalidate = 10;
 import { getOrderById } from "@/actions/order/get-order-by-id";
 import Title from "@/components/ui/title/Title";
-import { format } from 'date-fns';
+import { format } from "date-fns";
 
 import clsx from "clsx";
-import Image from "next/image";
+
 
 import { redirect } from "next/navigation";
 
 import { BsFillCartCheckFill } from "react-icons/bs";
 
-import { FaCashRegister } from "react-icons/fa";
+
 import { IoCardOutline } from "react-icons/io5";
 import { MdOutlineDeliveryDining } from "react-icons/md";
 
@@ -45,103 +45,392 @@ export default async function OrdersByIdPage({ params }: Props) {
         <div className="flex flex-col w-[1000px]  ">
           <Title title={`Orden # ${id.split("-").at(1)}`} />
 
+          <div className="flex h-32 items-center justify-between px-5 py-3 bg-white border border-gray-200 rounded-full shadow-2xl">
+            {/* Ordered */}
+
+            {!order?.isOkforCook &&
+            !order?.isReadyForDelivery &&
+            !order?.isDelivered ? (
+              <>
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                  </div>
+
+                  
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.createdAt
+                      ? format(new Date(order.createdAt), "HH:mm dd-MM")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-900 text-white">
+                    <TbChefHat size={22}></TbChefHat>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisOkforCook
+                      ? format(
+                          new Date(order.DisOkforCook),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-900 text-white">
+                    <MdOutlineDeliveryDining
+                      size={22}
+                    ></MdOutlineDeliveryDining>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisReadyForDelivery
+                      ? format(
+                          new Date(order.DisReadyForDelivery),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-900 text-white">
+                    <BsFillCartCheckFill size={18}></BsFillCartCheckFill>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisDelivered
+                      ? format(
+                          new Date(order.DisDelivered),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
+            {/* en proceso */}
+
+            {order?.isOkforCook &&
+            !order?.isReadyForDelivery &&
+            !order?.isDelivered ? (
+              <>
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.createdAt
+                      ? format(new Date(order.createdAt), "HH:mm dd-MM")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-green-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <TbChefHat size={22}></TbChefHat>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisOkforCook
+                      ? format(
+                          new Date(order.DisOkforCook),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-900 text-white">
+                    <MdOutlineDeliveryDining
+                      size={22}
+                    ></MdOutlineDeliveryDining>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisReadyForDelivery
+                      ? format(
+                          new Date(order.DisReadyForDelivery),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-900 text-white">
+                    <BsFillCartCheckFill size={18}></BsFillCartCheckFill>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisDelivered
+                      ? format(
+                          new Date(order.DisDelivered),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
+            {/* en proceso */}
+
+            {order?.isOkforCook &&
+            order?.isReadyForDelivery &&
+            !order?.isDelivered ? (
+              <>
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.createdAt
+                      ? format(new Date(order.createdAt), "HH:mm dd-MM")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-green-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <TbChefHat size={22}></TbChefHat>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisOkforCook
+                      ? format(
+                          new Date(order.DisOkforCook),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-green-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <MdOutlineDeliveryDining
+                      size={22}
+                    ></MdOutlineDeliveryDining>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisReadyForDelivery
+                      ? format(
+                          new Date(order.DisReadyForDelivery),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-gray-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-gray-900 text-white">
+                    <BsFillCartCheckFill size={18}></BsFillCartCheckFill>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisDelivered
+                      ? format(
+                          new Date(order.DisDelivered),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+
+            {/* en proceso */}
+
+            {order?.isOkforCook &&
+            order?.isReadyForDelivery &&
+            order?.isDelivered ? (
+              <>
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.createdAt
+                      ? format(new Date(order.createdAt), "HH:mm dd-MM")
+                      : "-"}
+                  </p>
+                </div>
+
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-green-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <TbChefHat size={22}></TbChefHat>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisOkforCook
+                      ? format(
+                          new Date(order.DisOkforCook),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-green-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <MdOutlineDeliveryDining
+                      size={22}
+                    ></MdOutlineDeliveryDining>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {" "}
+                    {order.DisReadyForDelivery
+                      ? format(
+                          new Date(order.DisReadyForDelivery),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+                <div className="flex-auto border-t-2 transition duration-500 ease-in-out border-green-900"></div>
+
+                <div className="flex flex-col items-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center bg-green-900 text-white">
+                    <BsFillCartCheckFill size={18}></BsFillCartCheckFill>
+                  </div>
+
+                  <p className="text-xs mt-2">
+                    {order.DisDelivered
+                      ? format(
+                          new Date(order.DisDelivered),
+                          "HH:mm dd-MM"
+                        )
+                      : "-"}
+                  </p>
+                </div>
+              </>
+            ) : (
+              <></>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
             <div className="flex flex-col mt-5">
               <div
                 className={clsx(
                   "flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5",
                   {
-                    "bg-gray-500": !order?.isPaid,
-                    "bg-green-700": order?.isPaid,
+                    "bg-gray-900": !order?.isPaid,
+                    "bg-green-900": order?.isPaid,
                   }
                 )}
               >
                 <IoCardOutline size={30} />
-
-                <span className="mx-2">
-                  {order?.isPaid ? "Orden pagada" : "Orden pendiente de pago"}
-                </span>
+                <div className="flex justify-between w-full">
+                  <span className="mx-2">
+                    {order?.isPaid ? "Orden pagada" : "Orden pendiente de pago"}
+                  </span>
+                  <span>
+                    {order.DisPaid
+                      ? format(new Date(order.DisPaid), "HH:mm dd-MM")
+                      : "-"}
+                  </span>
+                </div>
               </div>
-
-              {!order?.isOkforCook &&
-              !order?.isReadyForDelivery &&
-              !order?.isDelivered ? (
-                <>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-gray-500">
-                    <FaCashRegister size={30}></FaCashRegister>
-                    <span className="mx-2">
-                      Orden confirmada: {order.createdAt ? format(new Date(order.createdAt), "HH:mm:ss - dd/MM ") : '-'}
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
-
-              {order?.isOkforCook &&
-              !order?.isReadyForDelivery &&
-              !order?.isDelivered ? (
-                <>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                    <FaCashRegister size={30}></FaCashRegister>
-                    <span className="mx-2">Tomamos tu pedido</span>
-                  </div>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-blue-700">
-                    <TbChefHat size={30}></TbChefHat>
-                    <span className="mx-2">Estamos preparando tu pedido</span>
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
-
-              {order?.isOkforCook &&
-              order?.isReadyForDelivery &&
-              !order?.isDelivered ? (
-                <>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                    <FaCashRegister size={30}></FaCashRegister>
-                    <span className="mx-2">Tomamos tu pedido</span>
-                  </div>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                    <TbChefHat size={30}></TbChefHat>
-                    <span className="mx-2">Tu pedido esta listo</span>
-                  </div>
-
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-blue-700">
-                    <MdOutlineDeliveryDining
-                      size={30}
-                    ></MdOutlineDeliveryDining>
-                    <span className="mx-2">Estamos llegando...</span>
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
-
-              {order?.isOkforCook &&
-              order?.isReadyForDelivery &&
-              order?.isDelivered ? (
-                <>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                    <FaCashRegister size={30}></FaCashRegister>
-                    <span className="mx-2">Tomamos tu pedido</span>
-                  </div>
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                    <TbChefHat size={30}></TbChefHat>
-                    <span className="mx-2">Tu pedido esta listo</span>
-                  </div>
-
-                  <div className="flex items-center rounded-lg py-2 px-3.5 text-xs font-bold text-white mb-5 bg-green-700">
-                    <BsFillCartCheckFill size={30}></BsFillCartCheckFill>
-                    <span className="mx-2">
-                      tu pedido fue enviado con éxito
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
 
               {order?.OrderItem.map((product) => (
                 <div
