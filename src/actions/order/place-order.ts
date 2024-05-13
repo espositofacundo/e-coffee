@@ -55,12 +55,12 @@ export const placeOrder = async (
   let Delivery = 0;
 
   if (address.address !== "") {
-    Delivery = 1000; // No uses 'const' aquí para actualizar la variable externa
+    Delivery = 1500; // No uses 'const' aquí para actualizar la variable externa
   }
 
   const subtotaldelivery = subTotal + Delivery;
 
-  const percentTax = 0.21;
+  const percentTax = 0;
 
   const tax = subtotaldelivery * percentTax;
 

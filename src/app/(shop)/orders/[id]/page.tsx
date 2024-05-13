@@ -485,11 +485,15 @@ export default async function OrdersByIdPage({ params }: Props) {
 
                 <span>Subtotal</span>
                 <span className="text-right">${order?.subtotal}</span>
-                <span>Delivery</span>
-                <span className="text-right">${order?.Delivery}</span>
 
-                <span>Impuestos</span>
-                <span className="text-right">${order?.tax}</span>
+                {
+                  order?.Delivery !== 0 ? <><span>Delivery</span>
+                  <span className="text-right">${order?.Delivery}</span></>
+                  :<></>
+                }
+                
+
+               
 
                 <div className="w-full h-px bg-gray-200 my-4 col-span-2" />
 
