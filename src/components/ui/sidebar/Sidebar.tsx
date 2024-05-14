@@ -40,7 +40,7 @@ const Sidebar = () => {
 
       <nav
         className={clsx(
-          "fixed pr-2 pt-4 pl-2 sm:p-5 right-0 top-0  sm:w-[500px] h-screen bg-white z-20 shadow-2xl transform transition-all duration-300",
+          "fixed pr-2 pt-4 pl-2 sm:p-5 right-0 top-0  sm:w-[500px] w-1/2 h-screen bg-gray-200 z-20 shadow-2xl transform transition-all duration-300",
           {
             "translate-x-full": !isSideMenuOpen,
           }

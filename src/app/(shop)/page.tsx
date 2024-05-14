@@ -112,7 +112,7 @@ export default function Home({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-10 mb-10">
+      <div className="grid grid-cols-2 sm:grid-cols-3 sm:gap-10 gap-3 mx-3 mb-10">
         {products.map((product) => (
           <Link key={product.id} href={`/product/${product.slug}`}>
             <div className="rounded-lg overflow-hidden shadow-lg transform transition duration-500 hover:scale-105">

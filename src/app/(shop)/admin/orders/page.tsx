@@ -5,11 +5,13 @@ import Title from "@/components/ui/title/Title";
 
 import { redirect } from "next/navigation";
 import OrderTable from "./ui/OrderTable";
-import Pagination from "@/components/ui/pagination/Pagination";
+import GlobalOrders from "./ui/globalOrders";
+
 
 
 export default async function OrdersPays() {
   const { ok, orders = [] } = await getPaginatedOrders();
+ 
 
   if (!ok) {
     redirect("/auth/login");
@@ -18,11 +20,15 @@ export default async function OrdersPays() {
   return (
     <>
       <Title title="Orders" />
+     
+      <div className="mb-10">
+        <GlobalOrders orders={orders}/>
+      </div>
 
       <div className="mb-10">
         <OrderTable orders={orders}/>
       </div>
-      <Pagination totalPages={3}></Pagination>
+
     </>
   );
 }

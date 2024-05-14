@@ -22,6 +22,7 @@ interface Props {
   };
 }
 
+
 export default async function OrdersByIdPage({ params }: Props) {
   const { id } = params;
 
@@ -42,6 +43,8 @@ export default async function OrdersByIdPage({ params }: Props) {
       <div className="flex justify-center items-center mb-72 px-5 sm:px-0">
         <div className="flex flex-col w-[1000px]  ">
           <Title title={`Orden # ${id.split("-").at(1)}`} />
+
+          
 
           <div className="flex h-32 items-center justify-between px-5 py-3 bg-white border border-gray-200 rounded-full shadow-2xl">
             {/* Ordered */}
@@ -71,7 +74,7 @@ export default async function OrdersByIdPage({ params }: Props) {
                   <p className="text-xs mt-2">
                     {" "}
                     {order.createdAt
-                      ? format(new Date(order.createdAt), "HH:mm dd-MM")
+                      ? format(new Date(order.createdAt), "HH:mm")
                       : "-"}
                   </p>
                 </div>
