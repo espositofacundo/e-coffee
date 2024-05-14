@@ -132,7 +132,7 @@ const GlobalOrders = ({ orders }: Props) => {
           <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center">
           {Math.floor(averagedeliveryTime)} Min
           </td>
-          <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center"></td>
+  
      
         </tr>
       </tbody>

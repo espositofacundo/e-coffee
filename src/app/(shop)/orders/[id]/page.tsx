@@ -388,7 +388,7 @@ export default async function OrdersByIdPage({ params }: Props) {
               {order?.OrderItem.map((product) => (
                 <div
                   key={product.product.slug}
-                  className="flex bg-white rounded-xl shadow-2xl"
+                  className="flex bg-white rounded-xl mb-4 shadow-2xl"
                 >
                   <ProductImage
                     src={product.product.ProductImage[0].url}

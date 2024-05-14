@@ -19,11 +19,12 @@ export default async function OrdersPays() {
 
   return (
     <>
-      <Title title="Orders" />
+      <Title title="Global de hoy" />
      
       <div className="mb-10">
         <GlobalOrders orders={orders}/>
       </div>
+      <Title title="Todas las ordenes" />
 
       <div className="mb-10">
         <OrderTable orders={orders}/>
