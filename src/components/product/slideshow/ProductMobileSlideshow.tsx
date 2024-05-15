@@ -27,10 +27,11 @@ const ProductMobileSlideshow = ({ images, title, className }: Props) => {
       <Swiper
       style={{
         width: '100vw',
+        height: 'auto',
         
       }
       }
-        navigation={true}
+   
         autoplay={{
           delay: 2500,
         }}

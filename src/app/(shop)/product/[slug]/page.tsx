@@ -7,7 +7,7 @@ import ProductSlideshow from "@/components/product/slideshow/ProductSlideshow";
 import ProductMobileSlideshow from "@/components/product/slideshow/ProductMobileSlideshow";
 
 import { getProductbySlug } from "@/actions/products/get-product-by-slug";
-import StockLabel from "@/components/product/stock-label/StockLabel";
+
 import { Metadata, ResolvingMetadata } from "next";
 import AddToCart from "./ui/AddToCart";
 import PageNotFound from "../../category/not-found";
@@ -59,7 +59,7 @@ export default async function ProductDetails({ params }: Props) {
   }
 
   return (
-    <div className="mt-5 mb-20 grid md:grid-cols-3 gap-3">
+    <div className="mb-20 grid md:grid-cols-3 gap-3">
       <div className="col-span-1 md:col-span-2 ">
         <ProductMobileSlideshow
           title={product.title}
