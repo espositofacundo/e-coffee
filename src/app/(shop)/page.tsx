@@ -58,7 +58,7 @@ export default function Home({ searchParams }: Props) {
   return (
     <>
       <div className="r">
-        <div className="p-2 overflow-hidden">
+        <div className="overflow-hidden">
           <BanerSlideShowHome />
         </div>
 
