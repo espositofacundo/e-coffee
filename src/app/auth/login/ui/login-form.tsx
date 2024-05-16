@@ -53,7 +53,7 @@ const LoginForm = () => {
           {state === "CredentialsSignin" && (
             <>
               <IoInformationOutline className="h-5 w-5 text-red-500" />
-              <p className="text-sm text-red-500">Credencial inv&aacute;lida</p>
+              <p className="text-sm text-red-500">Credencial invalida</p>
             </>
           )}
         </div>
@@ -62,7 +62,7 @@ const LoginForm = () => {
 
         <LoginButton />
 
-        <span className="text-xs text-gray-500">Puedes utilizar nuestra cuenta de invitado sino deseas hacer el registro. En caso de quieras poder ver tus ordenes y aprovechar de nuestro sistema de puntos clickea en "Crear nueva cuenta". </span>
+        <span className="text-xs text-gray-500">Puedes utilizar nuestra cuenta de invitado sino deseas hacer el registro. En caso de quieras poder ver tus ordenes y aprovechar de nuestro sistema de puntos clickea en Crear nueva cuenta. </span>
 
         <div className="flex items-center my-5">
           <div className="flex-1 border-t border-gray-500"></div>
