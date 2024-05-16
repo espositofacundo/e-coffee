@@ -62,7 +62,7 @@ const LoginForm = () => {
 
         <LoginButton />
 
-        <span className="text-xs text-gray-500">Puedes utilizar nuestra cuenta de invitado. En caso de quieras poder ver tus ordenes y aprovechar de nuestro sistema de puntos clickea en Crear nueva cuenta. </span>
+        <span className="text-xs text-gray-500">Puedes utilizar nuestra cuenta de invitado. Si quieres ver tus ordenes clickea en Crear nueva cuenta. </span>
 
         <div className="flex items-center my-5">
           <div className="flex-1 border-t border-gray-500"></div>
