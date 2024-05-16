@@ -32,7 +32,7 @@ const LoginForm = () => {
           className="px-5 py-2 border bg-blue-200 rounded mb-5"
           type="email"
           name="email"
-          defaultValue={'modo-invitado@ecoffee.com'}
+          defaultValue={'modoinvitado@ecoffee.com'}
      
         />
 
