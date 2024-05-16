@@ -24,7 +24,7 @@ const LoginForm = () => {
 
   return (
     <form action={dispatch}>
-      <h1 className="text-4xl mb-10">Login</h1>
+      <h1 className="text-4xl mb-10">Ingresar</h1>
 
       <div className="flex flex-col">
         <label htmlFor="email">Email</label>
@@ -32,7 +32,8 @@ const LoginForm = () => {
           className="px-5 py-2 border bg-blue-200 rounded mb-5"
           type="email"
           name="email"
-          autoComplete="username"
+          defaultValue={'modo-invitado@ecoffee.com'}
+     
         />
 
         <label htmlFor="email">Contraseña</label>
@@ -40,11 +41,12 @@ const LoginForm = () => {
           className="px-5 py-2 border bg-blue-200 rounded mb-5"
           type="password"
           name="password"
-          autoComplete="current-password"
+          defaultValue={'123123'}
+
         />
 
         <div
-          className="flex h-8 items-end space-x-1"
+          className="flex h-2 items-end space-x-1"
           aria-live="polite"
           aria-atomic="true"
         >
@@ -56,7 +58,11 @@ const LoginForm = () => {
           )}
         </div>
 
+        
+
         <LoginButton />
+
+        <span className="text-xs text-gray-500">*Puedes utilizar nuestra cuenta de invitado sino deseas hacer el registro. En caso de quieras poder ver tus ordenes y aprovechar de nuestro sistema de puntos clickea en "Crear nueva cuenta". </span>
 
         <div className="flex items-center my-5">
           <div className="flex-1 border-t border-gray-500"></div>
@@ -64,13 +70,13 @@ const LoginForm = () => {
           <div className="flex-1 border-t border-gray-500"></div>
         </div>
 
-        <Link href="/auth/new-account" className="btn-secondary text-center ">
+        
+
+        <Link href="/auth/new-account" className="btn-success text-center mb-12 ">
           Crear una nueva cuenta
         </Link>
 
-        <div className="flex items-center py-10">
-          <div className="flex-1 border-t w-full border-gray-500"></div>
-        </div>
+ 
       </div>
     </form>
   );

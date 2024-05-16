@@ -20,7 +20,7 @@ export const updateOrders = async (orderId: string, isOkforCook?: boolean, isPai
             if (isPaid) {
                 // Si isPaid es true, establece DisPaid en la fecha actual menos tres horas
                 const currentDate = new Date();
-                currentDate.setHours(currentDate.getHours()); // Restar tres horas
+                currentDate.setHours(currentDate.getHours()); 
                 updateData.DisPaid = currentDate;
             }
         }
