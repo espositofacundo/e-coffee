@@ -111,34 +111,36 @@ export default function Menu({ searchParams }: Props) {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-10 gap-3 mx-3 mb-10">
         {products.map((product) => (
-       
+          <Link key={product.id} href={`/product/${product.slug}`}>
             <div className="flex justify-between h-12 bg-gray-50">
-                <div className="flex">
+              <div className="flex">
                 <div className=" overflow-hidden ">
-                <Image
-                  src={product.images[0]}
-                  alt={product.title}
-                  width={80}
-                  height={80}
-                />
+                  <Image
+                    src={product.images[0]}
+                    alt={product.title}
+                    width={80}
+                    height={80}
+                  />
+                </div>
+
+                <div>
+                  <div className="w-fit">
+                    <h3 className="text-gray-950 font-bold">{product.title}</h3>
+                  </div>
+
+                  <div className="">
+                    <h3 className="text-gray-950 font-bold">
+                      ${product.price}
+                    </h3>
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <div className="w-fit">
-                  <h3 className="text-gray-950 font-bold">{product.title}</h3>
-                </div>
-
-                <div className="">
-                  <h3 className="text-gray-950 font-bold">${product.price}</h3>
-                </div>
+              <div className="bg-gray-900 hover:bg-gray-600 text-white px-2 pt-3  transition-all">
+                <GrCart size={20} />
               </div>
-
-                </div>
-             
-
-              <Link key={product.id} href={`/product/${product.slug}`} className="btn-categories "><GrCart /></Link>
             </div>
-
+          </Link>
         ))}
       </div>
     </>
