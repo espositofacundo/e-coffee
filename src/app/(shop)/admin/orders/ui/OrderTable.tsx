@@ -12,18 +12,19 @@ import {
 import { TbChefHat } from "react-icons/tb";
 import Link from "next/link";
 import type { Orders } from "@/interfaces/orders.interface";
-import { updateOrders } from "@/actions/order/update-orders";
+
 
 import { format } from "date-fns";
+import { updateOrderprocess } from "@/actions/order/updateOrderprocess";
+import { updateOrdersIsReady } from "@/actions/order/updateOrderIsReady";
+import { updateOrdersisDelivered } from "@/actions/order/updateOrdersIsDelivered";
+import { updateOrdersIsPaid } from "@/actions/order/updateOrderIsPaid";
 
 interface Props {
   orders: Orders[];
 }
 
 const OrderTable = ({ orders }: Props) => {
-  
-
-
   return (
     <table className="min-w-full">
       <thead className="bg-gray-200 border-b">
@@ -82,8 +83,6 @@ const OrderTable = ({ orders }: Props) => {
           >
             Entregado
           </th>
-
-          
         </tr>
       </thead>
       <tbody>
@@ -119,7 +118,7 @@ const OrderTable = ({ orders }: Props) => {
               )}
             </td>
             <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-             $ {order.total}
+              $ {order.total}
             </td>
             <td className="text-sm text-gray-900 font-light  pt-6 whitespace-nowrap flex justify-center">
               {!order?.isOkforCook &&
@@ -229,12 +228,11 @@ const OrderTable = ({ orders }: Props) => {
                   type="checkbox"
                   defaultChecked={order.isPaid}
                   onChange={(e) =>
-                    updateOrders(
+                    updateOrdersIsPaid(
                       order.id,
-                      order.isOkforCook,
+          
                       e.target.checked,
-                      order.isReadyForDelivery,
-                      order.isDelivered
+
                     )
                   }
                   className="text-sm"
@@ -261,13 +259,7 @@ const OrderTable = ({ orders }: Props) => {
                   type="checkbox"
                   defaultChecked={order.isOkforCook}
                   onChange={(e) =>
-                    updateOrders(
-                      order.id,
-                      e.target.checked,
-                      order.isPaid,
-                      order.isReadyForDelivery,
-                      order.isDelivered
-                    )
+                    updateOrderprocess(order.id, e.target.checked)
                   }
                   className="text-sm"
                 />
@@ -286,12 +278,10 @@ const OrderTable = ({ orders }: Props) => {
                   type="checkbox"
                   defaultChecked={order.isReadyForDelivery}
                   onChange={(e) =>
-                    updateOrders(
+                    updateOrdersIsReady(
                       order.id,
-                      order.isOkforCook,
-                      order.isPaid,
-                      e.target.checked,
-                      order.isDelivered
+
+                      e.target.checked
                     )
                   }
                   className="text-sm"
@@ -314,11 +304,9 @@ const OrderTable = ({ orders }: Props) => {
                   type="checkbox"
                   defaultChecked={order.isDelivered}
                   onChange={(e) =>
-                    updateOrders(
+                    updateOrdersisDelivered(
                       order.id,
-                      order.isOkforCook,
-                      order.isPaid,
-                      order.isReadyForDelivery,
+
                       e.target.checked
                     )
                   }
@@ -332,8 +320,6 @@ const OrderTable = ({ orders }: Props) => {
                 </span>
               </div>
             </td>
-
-            
           </tr>
         ))}
       </tbody>
