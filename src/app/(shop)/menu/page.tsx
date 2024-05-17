@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { getPaginatedProductsWithImages } from "@/actions/products/product-pagination";
-import BanerSlideShowHome from "@/components/product/slideshow/BanerSlideshow";
+
 
 import Image from "next/image";
 import Link from "next/link";
