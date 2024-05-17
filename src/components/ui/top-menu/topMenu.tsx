@@ -26,7 +26,7 @@ const TopMenu = () => {
             <CgCoffee className="w-6 h-6 mr-1" />
           </span>
           <span className="mr-1">|</span>
-          <span className="bg-green-200 p-1 rounded">E-coffee</span>
+          <span className="bg-green-200 p-1 rounded">E-Beer</span>
         </Link>
       </div>
       
