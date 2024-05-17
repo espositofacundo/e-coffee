@@ -17,6 +17,7 @@ import {
   IoShirtOutline,
   IoTicketOutline,
 } from "react-icons/io5";
+import { MdRestaurantMenu } from "react-icons/md";
 
 const Sidebar = () => {
   const isSideMenuOpen = UseUiStore((state) => state.isSideMenuOpen);
@@ -72,6 +73,14 @@ const Sidebar = () => {
             >
               <IoTicketOutline size={30} />
               <span className="ml-3 text-xl">Ordenes</span>
+            </Link>
+            <Link
+              href="/menu"
+              onClick={() => closeMenu()}
+              className="flex items-center mt-5 sm:mt-10 p-1 hover:bg-gray-100 rounded transition-all"
+            >
+              <MdRestaurantMenu  size={30} />
+              <span className="ml-3 text-xl">Nuestro menu</span>
             </Link>
 
             <button

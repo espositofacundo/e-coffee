@@ -6,6 +6,7 @@ import BanerSlideShowHome from "@/components/product/slideshow/BanerSlideshow";
 
 import Image from "next/image";
 import Link from "next/link";
+import { GrCart } from "react-icons/gr";
 
 interface Product {
   id: string;
@@ -27,7 +28,7 @@ interface Props {
   };
 }
 
-export default function Home({ searchParams }: Props) {
+export default function Menu({ searchParams }: Props) {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
     null
   );
@@ -58,10 +59,6 @@ export default function Home({ searchParams }: Props) {
   return (
     <>
       <div className="r">
-        <div className="overflow-hidden">
-          <BanerSlideShowHome />
-        </div>
-
         <div className="flex gap-3 flex-wrap p-4">
           <button
             className="btn-categories font-bold"
@@ -112,29 +109,36 @@ export default function Home({ searchParams }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 sm:gap-10 gap-3 mx-3 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 sm:gap-10 gap-3 mx-3 mb-10">
         {products.map((product) => (
-          <Link key={product.id} href={`/product/${product.slug}`}>
-            <div className="rounded-lg overflow-hidden shadow-lg transform transition duration-500 hover:scale-105">
-              <div className="image-container">
+       
+            <div className="flex justify-between h-12 bg-gray-50">
+                <div className="flex">
+                <div className=" overflow-hidden ">
                 <Image
                   src={product.images[0]}
                   alt={product.title}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  width={80}
+                  height={80}
                 />
               </div>
-              <div className="p-4 bg-gray-950 rounded-b-lg flex flex-col">
-                <span className="text-lg h-14 font-semibold text-gray-100 hover:underline">
-                  {product.title}
-                </span>
-                <span className="text-lg font-bold text-gray-300">
-                  $ {product.price}
-                </span>
+
+              <div>
+                <div className="w-fit">
+                  <h3 className="text-gray-950 font-bold">{product.title}</h3>
+                </div>
+
+                <div className="">
+                  <h3 className="text-gray-950 font-bold">${product.price}</h3>
+                </div>
               </div>
+
+                </div>
+             
+
+              <Link key={product.id} href={`/product/${product.slug}`} className="btn-categories "><GrCart /></Link>
             </div>
-          </Link>
+
         ))}
       </div>
     </>

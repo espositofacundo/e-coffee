@@ -11,7 +11,6 @@ export default async function ProfilePage() {
     <div>
       <Title title="Perfil" />
 
-      <pre>{JSON.stringify(session.user, null, 2)}</pre>
       <h3>Role: {session.user.role}</h3>
       <h3>email:{session.user.email}</h3>
     </div>

@@ -26,7 +26,6 @@ interface Props {
 export default async function OrdersByIdPage({ params }: Props) {
   const { id } = params;
 
-  // Todo: llamar el server action
 
   const { ok, order } = await getOrderById(id);
 
@@ -36,8 +35,7 @@ export default async function OrdersByIdPage({ params }: Props) {
   if (order) {
     const { id, total, address = "", ...rest } = order;
 
-    // Ahora puedes pasar solo los datos necesarios a PaymentMethods
-    // Asumiendo que PaymentMethods solo necesita id, total y address
+  
 
     return (
       <div className="flex justify-center items-center mb-72 px-5 sm:px-0">
