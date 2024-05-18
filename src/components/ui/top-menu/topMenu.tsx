@@ -1,12 +1,13 @@
 "use client";
-import { titleFont } from "@/config/fonts";
+
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { IoCartOutline, IoSearchOutline } from "react-icons/io5";
+import { IoCartOutline } from "react-icons/io5";
 import { UseUiStore } from "@/store/ui/ui-store";
-import { CgCoffee } from "react-icons/cg";
+
 import { useCartStore } from "@/store/ui/cart/cart-store";
 import { IoMdMenu } from "react-icons/io";
+import { CiBeerMugFull } from "react-icons/ci";
 
 const TopMenu = () => {
   const openSideMenu = UseUiStore((state) => state.openSideMenu);
@@ -23,7 +24,7 @@ const TopMenu = () => {
           <span
             className={` antialiased font-bold flex items-center`}
           >
-            <CgCoffee className="w-6 h-6 mr-1" />
+            <CiBeerMugFull  className="w-6 h-6 mr-1" />
           </span>
           <span className="mr-1">|</span>
           <span className="bg-green-200 p-1 rounded">E-Beer</span>
