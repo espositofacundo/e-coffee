@@ -40,12 +40,12 @@ const BanerSlideShowHome = () => {
         modules={[FreeMode, Navigation, Thumbs, Autoplay]}
         className="mySwiper2"
       >
-        <SwiperSlide key="/imgs/b1.jpg">
+        <SwiperSlide key="/imgs/b9.jpg">
           <Image
             width={1024}
             height={800}
-            src="/imgs/b1.jpg"
-            alt="b1"
+            src="/imgs/b9.jpg"
+            alt="b9"
             className="object-contain"
             
             priority
@@ -53,46 +53,37 @@ const BanerSlideShowHome = () => {
     
           />
         </SwiperSlide>
-        <SwiperSlide key="/imgs/b2.jpg">
+        <SwiperSlide key="/imgs/b8.jpg">
           <Image
             width={1024}
             height={800}
-            src="/imgs/b2.jpg"
-            alt="b2"
+            src="/imgs/b8.jpg"
+            alt="b8"
             className="object-contain"
             priority
           />
         </SwiperSlide>
-        <SwiperSlide key="/imgs/b3.jpg">
+        <SwiperSlide key="/imgs/b7.jpg">
           <Image
             width={1024}
             height={800}
-            src="/imgs/b3.jpg"
-            alt="b3"
+            src="/imgs/b7.jpg"
+            alt="b7"
             className="object-contain"
             priority
           />
         </SwiperSlide>
-        <SwiperSlide key="/imgs/b4.jpg">
+        <SwiperSlide key="/imgs/b6.jpg">
           <Image
             width={1024}
             height={800}
-            src="/imgs/b4.jpg"
-            alt="b4"
+            src="/imgs/b6.jpg"
+            alt="b6"
             className="object-contain"
             priority
           />
         </SwiperSlide>
-        <SwiperSlide key="/imgs/b5.jpg">
-          <Image
-            width={1024}
-            height={800}
-            src="/imgs/b5.jpg"
-            alt="b5"
-            className="object-contain"
-            priority
-          />
-        </SwiperSlide>
+       
       </Swiper>
      
     </div>

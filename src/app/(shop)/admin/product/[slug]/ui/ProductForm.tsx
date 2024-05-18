@@ -158,8 +158,8 @@ export const ProductForm = ({ product, categories }: Props) => {
             {...register("rootcategory", { required: true })}
           >
             <option value="">[Seleccione]</option>
-            <option value="coffee">coffee</option>
-            <option value="delicias">delicias</option>
+            <option value="coffee">Principal</option>
+            <option value="delicias">Secundario</option>
           </select>
         </div>
 

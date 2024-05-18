@@ -72,43 +72,12 @@ export default function Home({ searchParams }: Props) {
           <button
             className="btn-categories"
             onClick={() =>
-              handleCategoryChange("2768b5c1-07e1-469a-a855-218dbc186ce2")
+              handleCategoryChange("0ab04a40-4ba7-4669-93de-4092f7661f9b")
             }
           >
-            Cafeteria
+            Cervezas
           </button>
-          <button
-            className="btn-categories"
-            onClick={() =>
-              handleCategoryChange("0e94ad77-a50d-4c7b-a653-3e3727fede58")
-            }
-          >
-            Desayunos & Meriendas
-          </button>
-          <button
-            className="btn-categories"
-            onClick={() =>
-              handleCategoryChange("d9ef0a11-2c30-41b6-a86a-54b7a6cb035d")
-            }
-          >
-            Panes & Tostadas
-          </button>
-          <button
-            className="btn-categories"
-            onClick={() =>
-              handleCategoryChange("c5625528-56a2-4280-9594-71a31c89209d")
-            }
-          >
-            Licuados & Smoothies
-          </button>
-          <button
-            className="btn-categories"
-            onClick={() =>
-              handleCategoryChange("468a1c80-2c3b-429c-a2e8-ddab5cfe1a3e")
-            }
-          >
-            Pastelería
-          </button>
+          
         </div>
       </div>
 
