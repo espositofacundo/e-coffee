@@ -13,6 +13,12 @@ export const metadata: Metadata = {
     default: `${store.name} | Frutos secos y alimentos naturales`,
   },
   description: store.description,
+  // En public/ y con nombre propio: los íconos de src/app se sirven siempre con
+  // la misma URL y quedan cacheados aunque cambie el archivo.
+  icons: {
+    icon: [{ url: "/icons/favicon-128.png", type: "image/png", sizes: "128x128" }],
+    apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
+  },
 };
 
 export default function RootLayout({
