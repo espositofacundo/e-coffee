@@ -12,9 +12,9 @@ export default function Footer() {
           <Image
             src="/logo.png"
             alt={store.name}
-            width={300}
-            height={234}
-            className="rounded-lg h-[60px] w-auto"
+            width={512}
+            height={512}
+            className="h-16 w-auto"
           />
           <div>
             <p className={`${titleFont.className} text-xl font-bold`}>

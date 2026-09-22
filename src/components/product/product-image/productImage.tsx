@@ -36,9 +36,9 @@ const ProductImage = ({
         <Image
           src="/logo.png"
           alt=""
-          width={300}
-          height={234}
-          className="w-3/4 h-auto opacity-90"
+          width={512}
+          height={512}
+          className="w-3/5 h-auto opacity-90"
           priority={priority}
         />
       </div>

@@ -25,9 +25,9 @@ const TopMenu = () => {
           <Image
             src="/logo.png"
             alt={store.name}
-            width={300}
-            height={234}
-            className="h-10 w-auto"
+            width={512}
+            height={512}
+            className="h-11 w-auto"
             priority
           />
           <span

@@ -7,8 +7,8 @@ const PageNotFound = () => {
       <Image
         src="/logo.png"
         alt=""
-        width={300}
-        height={234}
+        width={512}
+        height={512}
         className="opacity-80 h-[120px] w-auto"
       />
       <h1 className="mt-6 text-2xl font-bold">No encontramos lo que buscabas</h1>

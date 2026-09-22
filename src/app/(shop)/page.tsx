@@ -17,9 +17,9 @@ export default async function Home() {
         <Image
           src="/logo.png"
           alt={store.name}
-          width={300}
-          height={234}
-          className="rounded-xl w-24 sm:w-32 h-auto"
+          width={512}
+          height={512}
+          className="w-24 sm:w-32 h-auto drop-shadow-lg"
           priority
         />
         <div className="flex-1">

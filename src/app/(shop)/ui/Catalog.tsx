@@ -57,7 +57,7 @@ const Catalog = ({ categories }: Props) => {
           )}
         </div>
 
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 sm:flex-wrap sm:overflow-visible">
           <CategoryChip
             label="Todo"
             active={selectedCategory === null}
