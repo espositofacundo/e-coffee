@@ -1,6 +1,4 @@
-import { auth } from "@/auth.config";
 import { safeRedirect } from "@/utils/safe-redirect";
-import { redirect } from "next/navigation";
 import LoginForm from "./ui/login-form";
 
 export const metadata = {
@@ -13,14 +11,8 @@ interface Props {
   };
 }
 
-export default async function LoginPage({ searchParams }: Props) {
-  const redirectTo = safeRedirect(searchParams.redirectTo);
-
-  // Si ya tiene sesión (o acaba de ingresar), va directo a donde iba.
-  const session = await auth();
-  if (session?.user) {
-    redirect(redirectTo);
-  }
-
-  return <LoginForm redirectTo={redirectTo} />;
+// Sin redirección del servidor si ya hay sesión: al ingresar, el formulario
+// recarga la página completa para que el menú tome la sesión nueva.
+export default function LoginPage({ searchParams }: Props) {
+  return <LoginForm redirectTo={safeRedirect(searchParams.redirectTo)} />;
 }

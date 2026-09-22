@@ -1,6 +1,4 @@
-import { auth } from "@/auth.config";
 import { safeRedirect } from "@/utils/safe-redirect";
-import { redirect } from "next/navigation";
 import Registerform from "./ui/Registerform";
 
 export const metadata = {
@@ -13,13 +11,6 @@ interface Props {
   };
 }
 
-export default async function RegisterPage({ searchParams }: Props) {
-  const redirectTo = safeRedirect(searchParams.redirectTo);
-
-  const session = await auth();
-  if (session?.user) {
-    redirect(redirectTo);
-  }
-
-  return <Registerform redirectTo={redirectTo} />;
+export default function RegisterPage({ searchParams }: Props) {
+  return <Registerform redirectTo={safeRedirect(searchParams.redirectTo)} />;
 }
