@@ -26,6 +26,25 @@ Usuarios que crea el seed (contraseña `123123`):
 
 > El seed borra todos los datos antes de cargar. No correrlo contra la base de producción.
 
+## Producción (Vercel + Neon)
+
+Variables de entorno en Vercel: `DATABASE_URL` (conexión pooled), `DATABASE_URL_UNPOOLED` (conexión directa, la usan las migraciones), `AUTH_SECRET` y `CLOUDINARY_URL`. Si la base se crea desde **Storage → Neon**, Vercel carga las dos primeras solo.
+
+El build (`npm run build`) aplica las migraciones pendientes antes de compilar.
+
+Para cargar la lista de precios en una base nueva, desde la PC y en una terminal aparte:
+
+```powershell
+$env:DATABASE_URL="<DATABASE_URL de Neon>"
+$env:DATABASE_URL_UNPOOLED="<DATABASE_URL_UNPOOLED de Neon>"
+npx prisma migrate deploy
+$env:SEED_ADMIN_EMAIL="<email del dueño>"
+$env:SEED_ADMIN_PASSWORD="<contraseña>"
+npm run seed
+```
+
+Con `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` el seed crea solo ese administrador, sin los usuarios de prueba. En una base remota que ya tiene pedidos el seed no se ejecuta, para no borrarlos. Cerrá esa terminal al terminar, así no quedan apuntando a producción.
+
 ## Cómo funciona
 
 **Productos.** Cada producto se vende por kilo (con precio opcional por ½ kg) o por unidad. Puede tener variedades, por ejemplo sabores; en ese caso el cliente tiene que elegir una al pedir. Un producto marcado "Sin stock" deja de aparecer en el catálogo.

@@ -1,3 +1,4 @@
+import bcryptjs from "bcryptjs";
 import { initialData, SeedProduct } from "./seed";
 import prisma from "../lib/prisma";
 import { slugify } from "../utils/slugify";
@@ -15,7 +16,35 @@ const uniqueSlug = (product: SeedProduct, used: Set<string>) => {
   return slug;
 };
 
+// Con SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD se crea solo ese administrador
+// (para producción). Sin ellas, se crean los usuarios de prueba.
+const getSeedUsers = () => {
+  const email = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.SEED_ADMIN_PASSWORD;
+  if (!email && !password) return initialData.users;
+
+  if (!email || !password || password.length < 6) {
+    throw new Error(
+      "Definí SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD (mínimo 6 caracteres)."
+    );
+  }
+  return [{ email, password: bcryptjs.hashSync(password), role: "admin" as const }];
+};
+
+const isLocalDatabase = () =>
+  /@(localhost|127\.0\.0\.1)[:/]/.test(process.env.DATABASE_URL ?? "");
+
 async function main() {
+  // En una base remota con pedidos no se corre: borraría datos reales.
+  if (!isLocalDatabase() && (await prisma.order.count()) > 0) {
+    console.log(
+      "La base ya tiene pedidos, así que el seed no se ejecutó para no borrarlos."
+    );
+    return;
+  }
+
+  const users = getSeedUsers();
+
   // borro toda la data previa
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
@@ -26,7 +55,7 @@ async function main() {
   // Los pedidos vuelven a numerarse desde #0001.
   await prisma.$executeRawUnsafe(`ALTER SEQUENCE "Order_number_seq" RESTART WITH 1`);
 
-  const { categories, users } = initialData;
+  const { categories } = initialData;
 
   await prisma.user.createMany({ data: users });
 
@@ -54,12 +83,19 @@ async function main() {
 
   const productCount = await prisma.product.count();
   console.log(
-    `Seed ejecutado: ${categories.length} categorías, ${productCount} productos, ${users.length} usuarios.`
+    `Seed ejecutado: ${categories.length} categorías, ${productCount} productos, ` +
+      `usuarios: ${users.map((user) => user.email).join(", ")}.`
   );
 }
 
 (async () => {
   if (process.env.NODE_ENV === "production") return;
-  await main();
-  await prisma.$disconnect();
+  try {
+    await main();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error);
+    process.exitCode = 1;
+  } finally {
+    await prisma.$disconnect();
+  }
 })();
