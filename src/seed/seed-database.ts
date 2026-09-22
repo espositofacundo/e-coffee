@@ -16,19 +16,26 @@ const uniqueSlug = (product: SeedProduct, used: Set<string>) => {
   return slug;
 };
 
-// Con SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD se crea solo ese administrador
-// (para producción). Sin ellas, se crean los usuarios de prueba.
+// Con SEED_ADMINS="tomi:clave1,valen:clave2" se crean solo esos administradores
+// (para producción). Sin la variable, se crean los usuarios de prueba.
 const getSeedUsers = () => {
-  const email = process.env.SEED_ADMIN_EMAIL?.trim().toLowerCase();
-  const password = process.env.SEED_ADMIN_PASSWORD;
-  if (!email && !password) return initialData.users;
+  const admins = process.env.SEED_ADMINS?.trim();
+  if (!admins) return initialData.users;
 
-  if (!email || !password || password.length < 6) {
-    throw new Error(
-      "Definí SEED_ADMIN_EMAIL y SEED_ADMIN_PASSWORD (mínimo 6 caracteres)."
-    );
-  }
-  return [{ email, password: bcryptjs.hashSync(password), role: "admin" as const }];
+  return admins.split(",").map((entry) => {
+    const separator = entry.indexOf(":");
+    const email = (separator === -1 ? entry : entry.slice(0, separator))
+      .trim()
+      .toLowerCase();
+    const password = separator === -1 ? "" : entry.slice(separator + 1);
+
+    if (!email || password.length < 6) {
+      throw new Error(
+        `SEED_ADMINS inválido para "${email}": usá usuario:contraseña (mínimo 6 caracteres).`
+      );
+    }
+    return { email, password: bcryptjs.hashSync(password), role: "admin" as const };
+  });
 };
 
 const isLocalDatabase = () =>

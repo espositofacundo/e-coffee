@@ -31,7 +31,8 @@ export const authConfig: NextAuthConfig = {
     Credentials({
       async authorize(credentials) {
         const parsedCredentials = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          // Los clientes entran con su email; los administradores pueden usar un usuario (ej. "tomi").
+          .object({ email: z.string().trim().min(1), password: z.string().min(6) })
           .safeParse(credentials);
 
         // si el parseo no es correcto retoname null

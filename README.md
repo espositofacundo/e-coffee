@@ -38,12 +38,11 @@ Para cargar la lista de precios en una base nueva, desde la PC y en una terminal
 $env:DATABASE_URL="<DATABASE_URL de Neon>"
 $env:DATABASE_URL_UNPOOLED="<DATABASE_URL_UNPOOLED de Neon>"
 npx prisma migrate deploy
-$env:SEED_ADMIN_EMAIL="<email del dueño>"
-$env:SEED_ADMIN_PASSWORD="<contraseña>"
+$env:SEED_ADMINS="<usuario>:<contraseña>,<usuario2>:<contraseña2>"
 npm run seed
 ```
 
-Con `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` el seed crea solo ese administrador, sin los usuarios de prueba. En una base remota que ya tiene pedidos el seed no se ejecuta, para no borrarlos. Cerrá esa terminal al terminar, así no quedan apuntando a producción.
+Con `SEED_ADMINS` el seed crea solo esos administradores, sin los usuarios de prueba. El usuario puede ser un email o un nombre corto (ej. `tomi`); en el login se escribe tal cual. En una base remota que ya tiene pedidos el seed no se ejecuta, para no borrarlos. Cerrá esa terminal al terminar, así no quedan apuntando a producción.
 
 ## Cómo funciona
 

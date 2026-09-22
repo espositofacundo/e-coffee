@@ -35,9 +35,17 @@ const LoginForm = ({ redirectTo }: Props) => {
       <div className="mt-6 space-y-4">
         <div>
           <label htmlFor="email" className="label">
-            Email
+            Email o usuario
           </label>
-          <input id="email" className="input" type="email" name="email" autoComplete="email" required />
+          <input
+            id="email"
+            className="input"
+            type="text"
+            name="email"
+            autoComplete="username"
+            autoCapitalize="none"
+            required
+          />
         </div>
 
         <div>
@@ -58,7 +66,7 @@ const LoginForm = ({ redirectTo }: Props) => {
           <p className="flex items-center gap-1 text-sm text-red-600" aria-live="polite">
             <IoInformationCircleOutline size={18} />
             {state === "CredentialsSignin"
-              ? "Email o contraseña incorrectos"
+              ? "Usuario o contraseña incorrectos"
               : "No se pudo ingresar, probá de nuevo"}
           </p>
         )}
