@@ -5,6 +5,7 @@ import type { Address } from "@/interfaces/orders.interface";
 import type { Presentation } from "@/interfaces/product.interface";
 import prisma from "@/lib/prisma";
 import { getPresentationPrice, presentationLabel } from "@/utils/presentation";
+import { stockByProduct } from "@/utils/stock";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -117,24 +118,35 @@ export const placeOrder = async (
   );
 
   try {
-    const order = await prisma.order.create({
-      data: {
-        userId,
-        subtotal,
-        // El envío es gratis: el total es el subtotal.
-        total: subtotal,
-        itemsInOrder,
-        firstName: delivery.firstName,
-        phone: delivery.phone,
-        address: delivery.address,
-        notes: delivery.notes || null,
-        paymentMethod: delivery.paymentMethod,
-        OrderItem: { createMany: { data: orderItems } },
-      },
-    });
+    // El pedido y el descuento de stock van juntos: o se hacen los dos o ninguno.
+    // Solo se descuenta en productos con stock cargado; si no alcanza, queda en negativo.
+    const [order] = await prisma.$transaction([
+      prisma.order.create({
+        data: {
+          userId,
+          subtotal,
+          // El envío es gratis: el total es el subtotal.
+          total: subtotal,
+          itemsInOrder,
+          firstName: delivery.firstName,
+          phone: delivery.phone,
+          address: delivery.address,
+          notes: delivery.notes || null,
+          paymentMethod: delivery.paymentMethod,
+          OrderItem: { createMany: { data: orderItems } },
+        },
+      }),
+      ...Array.from(stockByProduct(orderItems)).map(([productId, amount]) =>
+        prisma.product.updateMany({
+          where: { id: productId, stock: { not: null } },
+          data: { stock: { decrement: amount } },
+        })
+      ),
+    ]);
 
     revalidatePath("/orders");
     revalidatePath("/admin/orders");
+    revalidatePath("/admin/products");
     return { ok: true, order };
   } catch (error) {
     console.log(error);

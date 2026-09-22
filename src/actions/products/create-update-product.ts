@@ -20,6 +20,10 @@ cloudinary.config(process.env.CLOUDINARY_URL ?? "");
 const emptyToNull = (value: unknown) =>
   value === "" || value === undefined || value === null ? null : value;
 
+// undefined = no vino en el formulario (no se toca); "" = vacío (null).
+const optionalNumber = (value: unknown) =>
+  value === undefined ? undefined : value === "" || value === null ? null : Number(value);
+
 const productSchema = z.object({
   id: z.string().uuid().optional().nullable(),
   title: z.string().trim().min(1).max(255),
@@ -38,6 +42,7 @@ const productSchema = z.object({
       .nullable()
   ),
   sellsHalf: z.preprocess((value) => value === "true", z.boolean()),
+  stock: z.preprocess(optionalNumber, z.number().finite().nullable().optional()),
   variants: z.string().default(""),
   available: z.preprocess((value) => value === "true", z.boolean()),
 });
@@ -54,7 +59,7 @@ export const createdUpdateProduct = async (formData: FormData) => {
     return { ok: false, message: "Revisá los datos del producto" };
   }
 
-  const { id, variants, sellsHalf, cost, ...rest } = productParsed.data;
+  const { id, variants, sellsHalf, cost, stock, ...rest } = productParsed.data;
 
   // Mismas reglas que la grilla de precios: con costo y margen, el precio sale
   // de la fórmula; con costo y precio, el margen se deduce.
@@ -90,6 +95,7 @@ export const createdUpdateProduct = async (formData: FormData) => {
     slug: slugify(rest.slug || rest.title),
     // Los productos por unidad no tienen precio por ½ kg.
     priceHalf: resolveHalfPrice(stored, rest.unit, price, sellsHalf, halfKgSurcharge),
+    ...(stock !== undefined && { stock }),
     variants: variants
       .split(",")
       .map((variant) => variant.trim())

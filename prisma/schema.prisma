@@ -60,6 +60,9 @@ model Product {
   price       Float    @default(0)
   // Precio por ½ kg: precio × (0,5 + recargo ½ kg). null = no se vende por ½ kg.
   priceHalf   Float?
+  // Stock en kg (o en unidades si unit = unidad). Se descuenta con cada pedido
+  // (½ kg = 0,5) y vuelve si se cancela. null = no se controla. Solo admin.
+  stock       Float?
   // Variedades / sabores que el cliente elige al pedir (ej. "Original", "Vainilla").
   variants    String[] @default([])
   available   Boolean  @default(true)

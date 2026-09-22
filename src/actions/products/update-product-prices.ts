@@ -20,6 +20,8 @@ const rowSchema = z.object({
   price: z.number().min(0),
   sellsHalf: z.boolean(),
   available: z.boolean(),
+  // Solo viene si se editó en la grilla (así no se pisa lo que descontaron los pedidos).
+  stock: z.number().finite().nullable().optional(),
 });
 
 const inputSchema = z.object({
@@ -93,6 +95,7 @@ export const updateProductPrices = async (input: z.infer<typeof inputSchema>) =>
             surchargeChanged
           ),
           available: row.available,
+          ...(row.stock !== undefined && { stock: row.stock }),
         },
       })
     );

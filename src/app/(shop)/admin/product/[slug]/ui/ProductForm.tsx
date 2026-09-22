@@ -25,7 +25,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface Props {
-  product: Partial<Product & { cost: number | null; markup: number | null }> & {
+  product: Partial<
+    Product & { cost: number | null; markup: number | null; stock: number | null }
+  > & {
     ProductImage?: ProductWithImage[];
   };
   categories: Category[];
@@ -42,6 +44,7 @@ interface FormInput {
   markup: string;
   price: string;
   sellsHalf: boolean;
+  stock: string;
   variants: string;
   available: boolean;
   images?: FileList;
@@ -69,6 +72,7 @@ export const ProductForm = ({ product, categories, halfKgSurcharge }: Props) => 
       price: product.price ? formatSheetNumber(product.price) : "",
       // Un producto nuevo por kilo arranca vendiéndose también por ½ kg.
       sellsHalf: product.id ? product.priceHalf != null : true,
+      stock: product.stock != null ? formatSheetNumber(product.stock) : "",
       variants: product.variants?.join(", ") ?? "",
       available: product.available ?? true,
       images: undefined,
@@ -102,6 +106,9 @@ export const ProductForm = ({ product, categories, halfKgSurcharge }: Props) => 
     formData.append("markup", cost !== null ? markup?.toString() ?? "" : "");
     formData.append("price", price?.toString() ?? "");
     formData.append("sellsHalf", String(productToSave.unit === "kg" && productToSave.sellsHalf));
+    // El stock solo se manda si se cambió: si entró un pedido mientras tanto, no se pisa.
+    const stock = parseSheetNumber(productToSave.stock);
+    if (stock !== (product.stock ?? null)) formData.append("stock", stock?.toString() ?? "");
     formData.append("variants", productToSave.variants);
     formData.append("available", String(productToSave.available));
 
@@ -295,6 +302,21 @@ export const ProductForm = ({ product, categories, halfKgSurcharge }: Props) => 
               ) : null}
             </label>
           )}
+          <div className="mt-3 max-w-[14rem]">
+            <label htmlFor="stock" className="label">
+              Stock ({unit === "kg" ? "kg" : "unidades"})
+            </label>
+            <input
+              id="stock"
+              inputMode="decimal"
+              className="input"
+              placeholder="Vacío = no se controla"
+              {...register("stock")}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Se descuenta solo con cada pedido (½ kg = 0,5).
+            </p>
+          </div>
         </fieldset>
 
         <div>

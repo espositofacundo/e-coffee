@@ -17,14 +17,16 @@ import { IoClipboardOutline, IoSearchOutline } from "react-icons/io5";
 import { ImportDialog } from "./ImportDialog";
 import { NumberCell } from "./NumberCell";
 import {
+  applyCellChange,
   applyPriceChange,
+  gridFields,
   halfPriceOf,
   isRowChanged,
+  isStockChanged,
   parseCellValue,
   parseClipboardTable,
-  priceFields,
   rowError,
-  type PriceField,
+  type GridField,
   type PriceRow,
 } from "./price-rows";
 
@@ -38,16 +40,25 @@ const productCount = (count: number) => `${count} ${count === 1 ? "producto" : "
 
 type Notice = { type: "ok" | "error"; text: string } | null;
 
-const columnLabels: Record<PriceField, string> = {
+const columnLabels: Record<GridField, string> = {
   cost: "Costo",
   markup: "Margen",
   price: "Precio 1 kg / unidad",
+  stock: "Stock",
 };
 
-const formatters: Record<PriceField, (value: number) => string> = {
+const columnWidths: Record<GridField, string> = {
+  cost: "w-28",
+  markup: "w-28",
+  price: "w-32",
+  stock: "w-28",
+};
+
+const formatters: Record<GridField, (value: number) => string> = {
   cost: formatSheetNumber,
   markup: formatMarkup,
   price: formatSheetNumber,
+  stock: formatSheetNumber,
 };
 
 export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
@@ -106,15 +117,15 @@ export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
 
   const updateRow = (row: PriceRow) => replaceRows([row]);
 
-  const focusCell = (index: number, field: PriceField) => {
+  const focusCell = (index: number, field: GridField) => {
     document.querySelector<HTMLInputElement>(`[data-cell="${index}:${field}"]`)?.focus();
   };
 
   // Pegar un bloque de celdas copiado de Excel: completa hacia abajo y hacia la
   // derecha desde la celda elegida, en el orden en que se ve la grilla.
-  const pasteBlock = (startIndex: number, startField: PriceField, text: string) => {
+  const pasteBlock = (startIndex: number, startField: GridField, text: string) => {
     const table = parseClipboardTable(text);
-    const startColumn = priceFields.indexOf(startField);
+    const startColumn = gridFields.indexOf(startField);
     const updated: PriceRow[] = [];
     let values = 0;
 
@@ -123,13 +134,13 @@ export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
       if (!target) return;
       let row = target;
       cells.forEach((cell, column) => {
-        const field = priceFields[startColumn + column];
+        const field = gridFields[startColumn + column];
         if (!field) return;
         const raw = cell.trim();
         const value = parseCellValue(field, raw);
         // Texto que no es número: esa celda se saltea.
         if (value === null && raw !== "") return;
-        row = applyPriceChange(row, field, value);
+        row = applyCellChange(row, field, value);
         values++;
       });
       updated.push(row);
@@ -220,6 +231,8 @@ export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
         price: row.price ?? 0,
         sellsHalf: row.sellsHalf,
         available: row.available,
+        // Solo si se editó: si entró un pedido mientras tanto, no se pisa lo descontado.
+        stock: isStockChanged(row, originals.get(row.id)!) ? row.stock : undefined,
       })),
       halfKgSurcharge: surchargeChanged ? surcharge : undefined,
     });
@@ -349,23 +362,27 @@ export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
       <p className="mt-3 text-xs text-gray-500">
         Escribí como en Excel: <strong>Enter</strong> o <strong>↓</strong> baja, <strong>↑</strong>{" "}
         sube, <strong>Tab</strong> avanza, <strong>Esc</strong> cancela. Cambiá cualquiera de los
-        tres (costo, margen o precio) y se recalcula el resto. Si pegás una columna copiada de
-        Excel, se completa hacia abajo en el orden de esta grilla.
+        tres (costo, margen o precio) y se recalcula el resto. El stock va en kg (o unidades) y
+        se descuenta solo con cada pedido; vacío = no se controla. Si pegás una columna copiada
+        de Excel, se completa hacia abajo en el orden de esta grilla.
       </p>
 
       {/* Grilla */}
       <div className="card mt-2 overflow-x-auto">
-        <table className="min-w-[980px] w-full text-sm">
+        <table className="min-w-[1080px] w-full text-sm">
           <thead className="sticky top-0 z-[1] bg-brand-green text-white text-left">
             <tr>
-              <th className="px-3 py-2.5 font-semibold">Producto</th>
+              <th className="px-3 py-2.5 font-semibold min-w-[15rem]">Producto</th>
               <th className="px-2 py-2.5 font-semibold text-center">Venta</th>
-              {priceFields.map((field) => (
-                <th key={field} className="px-3 py-2.5 font-semibold text-right w-36">
+              {gridFields.map((field) => (
+                <th
+                  key={field}
+                  className={clsx("px-3 py-2.5 font-semibold text-right", columnWidths[field])}
+                >
                   {columnLabels[field]}
                 </th>
               ))}
-              <th className="px-3 py-2.5 font-semibold text-right w-40">Precio ½ kg</th>
+              <th className="px-3 py-2.5 font-semibold text-right w-36">Precio ½ kg</th>
               <th className="px-3 py-2.5 font-semibold text-right w-28">Ganancia</th>
               <th className="px-3 py-2.5 font-semibold text-center w-24">Disponible</th>
             </tr>
@@ -391,7 +408,7 @@ export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
                   {showCategory && (
                     <tr>
                       <td
-                        colSpan={8}
+                        colSpan={9}
                         className="bg-brand-gold px-3 py-1.5 text-center font-bold text-white"
                       >
                         {row.categoryName}
@@ -419,29 +436,38 @@ export const PriceGrid = ({ products, halfKgSurcharge }: Props) => {
                     <td className="px-2 py-1 text-center text-xs text-gray-500">
                       {row.unit === "kg" ? "kg" : "unidad"}
                     </td>
-                    {priceFields.map((field) => (
+                    {gridFields.map((field) => (
                       <td key={field} className="px-1 py-1">
-                        <NumberCell
-                          cellId={`${index}:${field}`}
-                          ariaLabel={`${columnLabels[field]} de ${row.title}`}
-                          value={row[field]}
-                          format={formatters[field]}
-                          parse={(text) => parseCellValue(field, text)}
-                          placeholder={field === "markup" && row.cost === null ? "sin costo" : "—"}
-                          disabledReason={
-                            field === "markup" && row.cost === null
-                              ? "Cargá primero el costo"
-                              : undefined
-                          }
-                          changed={row[field] !== original[field]}
-                          invalid={
-                            (field === "markup" && row.markup !== null && !isValidMarkup(row.markup)) ||
-                            (field === "price" && (!row.price || row.price <= 0))
-                          }
-                          onCommit={(value) => updateRow(applyPriceChange(row, field, value))}
-                          onNavigate={(delta) => focusCell(index + delta, field)}
-                          onPasteBlock={(text) => pasteBlock(index, field, text)}
-                        />
+                        <div className="flex items-center">
+                          <NumberCell
+                            cellId={`${index}:${field}`}
+                            ariaLabel={`${columnLabels[field]} de ${row.title}`}
+                            value={row[field]}
+                            format={formatters[field]}
+                            parse={(text) => parseCellValue(field, text)}
+                            placeholder={field === "markup" && row.cost === null ? "sin costo" : "—"}
+                            disabledReason={
+                              field === "markup" && row.cost === null
+                                ? "Cargá primero el costo"
+                                : undefined
+                            }
+                            changed={row[field] !== original[field]}
+                            invalid={
+                              (field === "markup" && row.markup !== null && !isValidMarkup(row.markup)) ||
+                              (field === "price" && (!row.price || row.price <= 0)) ||
+                              // Stock negativo: entraron pedidos sin stock, hay que reponer.
+                              (field === "stock" && row.stock !== null && row.stock < 0)
+                            }
+                            onCommit={(value) => updateRow(applyCellChange(row, field, value))}
+                            onNavigate={(delta) => focusCell(index + delta, field)}
+                            onPasteBlock={(text) => pasteBlock(index, field, text)}
+                          />
+                          {field === "stock" && (
+                            <span className="w-5 shrink-0 text-xs text-gray-400">
+                              {row.unit === "kg" ? "kg" : "u"}
+                            </span>
+                          )}
+                        </div>
                       </td>
                     ))}
                     <td

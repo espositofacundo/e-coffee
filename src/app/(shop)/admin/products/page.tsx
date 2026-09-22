@@ -37,6 +37,7 @@ export default async function AdminProductsPage() {
     priceHalf: product.priceHalf,
     sellsHalf: product.priceHalf !== null,
     available: product.available,
+    stock: product.stock,
   }));
 
   return (

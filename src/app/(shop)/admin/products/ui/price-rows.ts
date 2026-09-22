@@ -12,6 +12,10 @@ export type PriceField = "cost" | "markup" | "price";
 
 export const priceFields: PriceField[] = ["cost", "markup", "price"];
 
+// Columnas editables de la grilla, en el orden en que se ven (para navegar y pegar).
+export type GridField = PriceField | "stock";
+export const gridFields: GridField[] = ["cost", "markup", "price", "stock"];
+
 export interface PriceRow {
   id: string;
   title: string;
@@ -27,6 +31,8 @@ export interface PriceRow {
   priceHalf: number | null;
   sellsHalf: boolean;
   available: boolean;
+  // Stock en kg (o unidades). null = no se controla.
+  stock: number | null;
 }
 
 // Aplica un valor editado como en la planilla: cualquier par define al tercero.
@@ -64,9 +70,13 @@ export const applyPriceChange = (
   return { ...row, price };
 };
 
+// Aplica un valor editado en cualquier columna de la grilla.
+export const applyCellChange = (row: PriceRow, field: GridField, value: number | null) =>
+  field === "stock" ? { ...row, stock: value } : applyPriceChange(row, field, value);
+
 // Lee un valor escrito en una celda. El margen va como multiplicador (1,350);
 // si alguien escribe el porcentaje (35), se convierte a 1,350.
-export const parseCellValue = (field: PriceField, text: string) => {
+export const parseCellValue = (field: GridField, text: string) => {
   const value = parseSheetNumber(text);
   if (value === null) return null;
   if (field === "markup" && value > MAX_MARKUP && value <= 500) return 1 + value / 100;
@@ -91,7 +101,11 @@ export const isRowChanged = (row: PriceRow, original: PriceRow) =>
   !sameNumber(row.markup, original.markup) ||
   !sameNumber(row.price, original.price) ||
   row.sellsHalf !== original.sellsHalf ||
-  row.available !== original.available;
+  row.available !== original.available ||
+  !sameNumber(row.stock, original.stock);
+
+export const isStockChanged = (row: PriceRow, original: PriceRow) =>
+  !sameNumber(row.stock, original.stock);
 
 // Texto copiado de una planilla: filas separadas por salto de línea, columnas por tab.
 export const parseClipboardTable = (text: string) => {
@@ -102,13 +116,14 @@ export const parseClipboardTable = (text: string) => {
 
 // ---- Importar desde la planilla (por nombre de producto) ----
 
-type SheetColumn = "name" | "detail" | "cost" | "markup" | "price";
+type SheetColumn = "name" | "detail" | "cost" | "markup" | "price" | "stock";
 
 const headerPatterns: [RegExp, SheetColumn][] = [
   [/^producto/, "name"],
   [/^detalle/, "detail"],
   [/^costo/, "cost"],
   [/^margen/, "markup"],
+  [/^stock/, "stock"],
   // "Precio 1 kg / unidad". El de ½ kg se calcula solo y se ignora (ver isHalfKgHeader).
   [/^precio-1-kg|^precio-unidad|^precio$/, "price"],
 ];
@@ -160,13 +175,13 @@ export const importFromSheet = (rows: PriceRow[], text: string): SheetImportResu
     const match = headerPatterns.find(([pattern]) => pattern.test(header));
     if (match && !columns.has(match[1])) columns.set(match[1], index);
   });
-  if (!columns.has("cost") && !columns.has("markup") && !columns.has("price")) {
+  if (!["cost", "markup", "price", "stock"].some((column) => columns.has(column as SheetColumn))) {
     return {
       rows,
       matched: 0,
       notFound: [],
       ambiguous: [],
-      error: "No encontré columnas de Costo, Margen o Precio en lo que pegaste.",
+      error: "No encontré columnas de Costo, Margen, Precio o Stock en lo que pegaste.",
     };
   }
 
@@ -185,8 +200,9 @@ export const importFromSheet = (rows: PriceRow[], text: string): SheetImportResu
     const cost = parseCellValue("cost", read(cells, "cost"));
     const markup = parseCellValue("markup", read(cells, "markup"));
     const price = parseCellValue("price", read(cells, "price"));
+    const stock = parseCellValue("stock", read(cells, "stock"));
     // Filas de categoría o vacías: sin números, se saltean.
-    if (!name || (cost === null && markup === null && price === null)) continue;
+    if (!name || (cost === null && markup === null && price === null && stock === null)) continue;
 
     const found = findProduct(next, name, read(cells, "detail"));
     if (found.length === 0) {
@@ -205,6 +221,7 @@ export const importFromSheet = (rows: PriceRow[], text: string): SheetImportResu
     if (price !== null && (row.cost === null || row.markup === null)) {
       row = applyPriceChange(row, "price", price);
     }
+    if (stock !== null) row = { ...row, stock };
 
     const updated = row;
     next = next.map((r) => (r.id === updated.id ? updated : r));
