@@ -112,7 +112,7 @@ const Sidebar = () => {
               Administración
             </p>
             <SidebarLink href="/admin/orders" icon={IoFileTrayFullOutline} label="Pedidos" onClick={closeMenu} />
-            <SidebarLink href="/admin/products" icon={IoPricetagsOutline} label="Productos" onClick={closeMenu} />
+            <SidebarLink href="/admin/products" icon={IoPricetagsOutline} label="Productos y precios" onClick={closeMenu} />
             <SidebarLink href="/admin/categories" icon={IoListOutline} label="Categorías" onClick={closeMenu} />
             <SidebarLink href="/admin/users" icon={IoPeopleOutline} label="Usuarios" onClick={closeMenu} />
           </>

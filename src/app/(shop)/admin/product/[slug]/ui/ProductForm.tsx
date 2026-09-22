@@ -10,14 +10,26 @@ import type {
   ProductImage as ProductWithImage,
   SaleUnit,
 } from "@/interfaces/product.interface";
+import { currencyFormat } from "@/utils/currency";
+import {
+  formatMarkup,
+  formatSheetNumber,
+  halfKgPrice,
+  isValidMarkup,
+  parseSheetNumber,
+  priceFromCost,
+} from "@/utils/pricing";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface Props {
-  product: Partial<Product> & { ProductImage?: ProductWithImage[] };
+  product: Partial<Product & { cost: number | null; markup: number | null }> & {
+    ProductImage?: ProductWithImage[];
+  };
   categories: Category[];
+  halfKgSurcharge: number;
 }
 
 interface FormInput {
@@ -26,14 +38,16 @@ interface FormInput {
   description: string;
   categoryId: string;
   unit: SaleUnit;
-  price: number;
-  priceHalf: string;
+  cost: string;
+  markup: string;
+  price: string;
+  sellsHalf: boolean;
   variants: string;
   available: boolean;
   images?: FileList;
 }
 
-export const ProductForm = ({ product, categories }: Props) => {
+export const ProductForm = ({ product, categories, halfKgSurcharge }: Props) => {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -50,8 +64,11 @@ export const ProductForm = ({ product, categories }: Props) => {
       description: product.description ?? "",
       categoryId: product.categoryId ?? "",
       unit: product.unit ?? "kg",
-      price: product.price,
-      priceHalf: product.priceHalf?.toString() ?? "",
+      cost: product.cost != null ? formatSheetNumber(product.cost) : "",
+      markup: product.markup != null ? formatMarkup(product.markup) : "",
+      price: product.price ? formatSheetNumber(product.price) : "",
+      // Un producto nuevo por kilo arranca vendiéndose también por ½ kg.
+      sellsHalf: product.id ? product.priceHalf != null : true,
       variants: product.variants?.join(", ") ?? "",
       available: product.available ?? true,
       images: undefined,
@@ -59,8 +76,16 @@ export const ProductForm = ({ product, categories }: Props) => {
   });
 
   const unit = watch("unit");
+  const sellsHalf = watch("sellsHalf");
+  const cost = parseSheetNumber(watch("cost"));
+  const markup = parseSheetNumber(watch("markup"));
+  const markupError = markup !== null && !isValidMarkup(markup);
+  // Con costo y margen, el precio sale de la fórmula (como en la planilla).
+  const usesFormula = cost !== null && cost > 0 && markup !== null && !markupError;
+  const price = usesFormula ? priceFromCost(cost, markup) : parseSheetNumber(watch("price"));
 
   const onSubmit = async (data: FormInput) => {
+    if (markupError) return;
     setIsSaving(true);
     setErrorMessage("");
 
@@ -73,8 +98,10 @@ export const ProductForm = ({ product, categories }: Props) => {
     formData.append("description", productToSave.description);
     formData.append("categoryId", productToSave.categoryId);
     formData.append("unit", productToSave.unit);
-    formData.append("price", productToSave.price.toString());
-    formData.append("priceHalf", productToSave.priceHalf);
+    formData.append("cost", cost?.toString() ?? "");
+    formData.append("markup", cost !== null ? markup?.toString() ?? "" : "");
+    formData.append("price", price?.toString() ?? "");
+    formData.append("sellsHalf", String(productToSave.unit === "kg" && productToSave.sellsHalf));
     formData.append("variants", productToSave.variants);
     formData.append("available", String(productToSave.available));
 
@@ -199,36 +226,76 @@ export const ProductForm = ({ product, categories }: Props) => {
           </div>
         </fieldset>
 
-        <div className="grid grid-cols-2 gap-3">
-          {unit === "kg" && (
+        <fieldset className="rounded-lg border border-brand-cream-dark p-4">
+          <legend className="label px-1 mb-0">Precio</legend>
+          <div className="grid grid-cols-3 gap-3">
             <div>
-              <label htmlFor="priceHalf" className="label">
-                Precio ½ kg
+              <label htmlFor="cost" className="label">
+                Costo
               </label>
               <input
-                id="priceHalf"
-                type="number"
-                min={0}
+                id="cost"
+                inputMode="decimal"
                 className="input"
-                placeholder="Vacío = no se vende por ½ kg"
-                {...register("priceHalf")}
+                placeholder="12.711"
+                {...register("cost")}
               />
             </div>
-          )}
-          <div>
-            <label htmlFor="price" className="label">
-              {unit === "kg" ? "Precio 1 kg" : "Precio por unidad"}
-            </label>
-            <input
-              id="price"
-              type="number"
-              min={0}
-              className="input"
-              {...register("price", { required: true, min: 0 })}
-            />
-            {errors.price && <p className="text-sm text-red-600 mt-1">Ingresá el precio</p>}
+            <div>
+              <label htmlFor="markup" className="label">
+                Margen
+              </label>
+              <input
+                id="markup"
+                inputMode="decimal"
+                className={clsx("input", markupError && "border-red-500")}
+                placeholder="1,350"
+                {...register("markup")}
+              />
+            </div>
+            <div>
+              <label htmlFor="price" className="label">
+                {unit === "kg" ? "Precio 1 kg" : "Precio unidad"}
+              </label>
+              {usesFormula ? (
+                <p className="px-3 py-2 rounded-lg bg-brand-green-light font-bold text-brand-green">
+                  {currencyFormat(price ?? 0)}
+                </p>
+              ) : (
+                <input
+                  id="price"
+                  inputMode="decimal"
+                  className="input"
+                  placeholder="17.160"
+                  {...register("price")}
+                />
+              )}
+            </div>
           </div>
-        </div>
+          {markupError ? (
+            <p className="text-sm text-red-600 mt-2">
+              El margen va como en la planilla: entre 1 y 10 (1,350 = 35 %).
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500 mt-2">
+              Con costo y margen el precio se calcula solo (costo × margen). Sin costo, escribí el
+              precio a mano; si cargás costo y precio, el margen se calcula al guardar.
+            </p>
+          )}
+
+          {unit === "kg" && (
+            <label className="mt-3 flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" className="h-4 w-4 accent-brand-green" {...register("sellsHalf")} />
+              <span className="font-medium">Se vende por ½ kg</span>
+              {sellsHalf && price ? (
+                <span className="text-sm text-gray-600">
+                  → {currencyFormat(halfKgPrice(price, halfKgSurcharge))} (kilo ×{" "}
+                  {formatMarkup(0.5 + halfKgSurcharge / 100)})
+                </span>
+              ) : null}
+            </label>
+          )}
+        </fieldset>
 
         <div>
           <label htmlFor="variants" className="label">

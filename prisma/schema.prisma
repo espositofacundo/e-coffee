@@ -52,9 +52,13 @@ model Product {
   slug        String   @unique
   description String   @default("")
   unit        SaleUnit @default(kg)
-  // Precio por kg o por unidad, según `unit`.
+  // Costo por kg o por unidad. Solo lo ven los administradores.
+  cost        Float?
+  // Multiplicador sobre el costo, como en la planilla (1.35 = 35 %). Solo admin.
+  markup      Float?
+  // Precio por kg o por unidad, según `unit`. Con costo y margen: costo × margen.
   price       Float    @default(0)
-  // Precio por ½ kg. null = no se vende por ½ kg.
+  // Precio por ½ kg: precio × (0,5 + recargo ½ kg). null = no se vende por ½ kg.
   priceHalf   Float?
   // Variedades / sabores que el cliente elige al pedir (ej. "Original", "Vainilla").
   variants    String[] @default([])
@@ -68,6 +72,14 @@ model Product {
   OrderItem    OrderItem[]
 
   @@index([categoryId])
+}
+
+// Configuración general de la tienda (una sola fila, id = 1).
+model StoreSetting {
+  id              Int      @id @default(1)
+  // Cuánto más caro es el ½ kg, en % del precio por kilo: ½ kg = kilo × (0,5 + 3,7 %).
+  halfKgSurcharge Float    @default(3.7)
+  updatedAt       DateTime @updatedAt
 }
 
 model ProductImage {

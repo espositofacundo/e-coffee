@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { publicProductSelect } from "@/lib/product-select";
 
 // Catálogo público: categorías en orden, con sus productos disponibles.
 export const getCatalog = async () => {
@@ -10,7 +11,8 @@ export const getCatalog = async () => {
       Product: {
         where: { available: true },
         orderBy: { title: "asc" },
-        include: {
+        select: {
+          ...publicProductSelect,
           ProductImage: { take: 1, select: { url: true } },
         },
       },

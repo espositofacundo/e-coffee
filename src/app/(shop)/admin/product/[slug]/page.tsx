@@ -1,7 +1,8 @@
 export const revalidate = 0;
 
 import { getCategories } from "@/actions/category/get-category";
-import { getProductbySlug } from "@/actions/products/get-product-by-slug";
+import { getAdminProduct } from "@/actions/products/get-admin-product";
+import { getStoreSettings } from "@/actions/settings/get-store-settings";
 import Title from "@/components/ui/title/Title";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -24,9 +25,10 @@ export const metadata = {
 export default async function AdminProductPage({ params, searchParams }: Props) {
   const { slug } = params;
 
-  const [product, categories] = await Promise.all([
-    slug === "new" ? null : getProductbySlug(slug),
+  const [product, categories, settings] = await Promise.all([
+    slug === "new" ? null : getAdminProduct(slug),
     getCategories(),
+    getStoreSettings(),
   ]);
 
   if (!product && slug !== "new") {
@@ -56,6 +58,7 @@ export default async function AdminProductPage({ params, searchParams }: Props) 
         key={product?.updatedAt.toISOString() ?? "new"}
         product={product ?? {}}
         categories={categories}
+        halfKgSurcharge={settings.halfKgSurcharge}
       />
     </>
   );

@@ -1,7 +1,14 @@
 "use server";
 
+import { getStoreSettings } from "@/actions/settings/get-store-settings";
 import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
+import { resolveHalfPrice } from "@/utils/half-price";
+import {
+  isValidMarkup,
+  markupFromPrice,
+  priceFromCost,
+} from "@/utils/pricing";
 import { slugify } from "@/utils/slugify";
 import { Prisma, SaleUnit } from "@prisma/client";
 import { v2 as cloudinary } from "cloudinary";
@@ -20,11 +27,9 @@ const productSchema = z.object({
   description: z.string().trim().default(""),
   categoryId: z.string().uuid(),
   unit: z.nativeEnum(SaleUnit),
-  price: z.coerce
-    .number()
-    .min(0)
-    .transform((val) => Math.round(val)),
-  priceHalf: z.preprocess(
+  cost: z.preprocess(emptyToNull, z.coerce.number().positive().nullable()),
+  markup: z.preprocess(emptyToNull, z.coerce.number().nullable()),
+  price: z.preprocess(
     emptyToNull,
     z.coerce
       .number()
@@ -32,6 +37,7 @@ const productSchema = z.object({
       .transform((val) => Math.round(val))
       .nullable()
   ),
+  sellsHalf: z.preprocess((value) => value === "true", z.boolean()),
   variants: z.string().default(""),
   available: z.preprocess((value) => value === "true", z.boolean()),
 });
@@ -48,12 +54,42 @@ export const createdUpdateProduct = async (formData: FormData) => {
     return { ok: false, message: "Revisá los datos del producto" };
   }
 
-  const { id, variants, ...rest } = productParsed.data;
+  const { id, variants, sellsHalf, cost, ...rest } = productParsed.data;
+
+  // Mismas reglas que la grilla de precios: con costo y margen, el precio sale
+  // de la fórmula; con costo y precio, el margen se deduce.
+  let { price, markup } = rest;
+  if (cost === null) {
+    markup = null;
+  } else if (markup !== null) {
+    if (!isValidMarkup(markup)) {
+      return { ok: false, message: "El margen tiene que estar entre 1 y 10 (ej. 1,35)" };
+    }
+    price = priceFromCost(cost, markup);
+  } else if (price) {
+    markup = markupFromPrice(cost, price);
+  }
+  if (!price) {
+    return { ok: false, message: "Falta el precio, o el costo y el margen para calcularlo" };
+  }
+
+  const [{ halfKgSurcharge }, stored] = await Promise.all([
+    getStoreSettings(),
+    id
+      ? prisma.product.findUnique({
+          where: { id },
+          select: { unit: true, price: true, priceHalf: true },
+        })
+      : null,
+  ]);
   const data = {
     ...rest,
+    cost,
+    markup,
+    price,
     slug: slugify(rest.slug || rest.title),
     // Los productos por unidad no tienen precio por ½ kg.
-    priceHalf: rest.unit === "unidad" ? null : rest.priceHalf,
+    priceHalf: resolveHalfPrice(stored, rest.unit, price, sellsHalf, halfKgSurcharge),
     variants: variants
       .split(",")
       .map((variant) => variant.trim())
