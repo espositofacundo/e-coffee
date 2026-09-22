@@ -6,59 +6,41 @@ import prisma from "@/lib/prisma";
 export const getOrderById = async (id: string) => {
   const session = await auth();
   if (!session?.user) {
-    return {
-      ok: false,
-      message: "Debe de estar autenticado",
-    };
+    return { ok: false, message: "Debe de estar autenticado" };
   }
 
   try {
     const order = await prisma.order.findUnique({
       where: { id },
-      include:{
-        OrderItem:{
-            select:{
-                price:true,
-                quantity:true,
-                size:true,
-
-                product:{
-                    select:{
-                        title:true,
-                        slug:true,
-
-                        ProductImage:{
-                            select:{
-                               url:true,
-                            },
-                            take:1
-
-                        }
-                    }
-                }
-            }
-
-        }
-      }
+      include: {
+        OrderItem: {
+          select: {
+            id: true,
+            price: true,
+            quantity: true,
+            presentation: true,
+            variant: true,
+            product: {
+              select: {
+                title: true,
+                slug: true,
+                ProductImage: { select: { url: true }, take: 1 },
+              },
+            },
+          },
+        },
+      },
     });
 
-    if(!order) throw `${id} no existe`
+    if (!order) throw `${id} no existe`;
 
-    if(session.user.role === 'user'){
-        if(session.user.id !== order.userId){
-            throw `${id} no corresponde a este usuario.`
-        }
+    if (session.user.role !== "admin" && session.user.id !== order.userId) {
+      throw `${id} no corresponde a este usuario.`;
     }
-    
-    return{
-        ok:true,
-        order:order,
-    }
+
+    return { ok: true, order };
   } catch (error) {
-    console.log(error)
-    return {
-      ok: false,
-      message: "orden no exite",
-    };
+    console.log(error);
+    return { ok: false, message: "El pedido no existe" };
   }
 };

@@ -1,19 +1,31 @@
+export type OrderStatus =
+  | "pendiente"
+  | "preparando"
+  | "en_camino"
+  | "entregado"
+  | "cancelado";
+
+export type PaymentMethod = "efectivo" | "transferencia";
+
+export interface Address {
+  firstName: string;
+  phone: string;
+  address: string;
+  notes: string;
+  paymentMethod: PaymentMethod;
+}
+
 export interface Orders {
   id: string;
+  number: number;
   total: number;
-  isPaid?: boolean;
-  isOkforCook?: boolean;
-  isReadyForDelivery?: boolean;
-  isDelivered?: boolean;
-  firstName?: string | null;
-  address?: string | null;
-  phone?: string | null;
-  transactionId?: string | null;
-  metodoDePago?: string | null;
-  DisPaid?: Date | null;
-  DisOkforCook?: Date | null;
-  DisReadyForDelivery?: Date | null;
-  DisDelivered?: Date | null;
-  createdAt?: Date | null;
-  updatedAt?: Date | null;
+  itemsInOrder: number;
+  status: OrderStatus;
+  isPaid: boolean;
+  paymentMethod: PaymentMethod;
+  firstName: string;
+  phone: string;
+  address: string;
+  notes: string | null;
+  createdAt: Date;
 }

@@ -1,11 +1,26 @@
+import { auth } from "@/auth.config";
+import { safeRedirect } from "@/utils/safe-redirect";
+import { redirect } from "next/navigation";
 import LoginForm from "./ui/login-form";
 
+export const metadata = {
+  title: "Ingresar",
+};
 
-export default function LoginPage () {
-  return (
-    <div className="flex flex-col min-h-screen pt-20 sm:pt-30">
-      <LoginForm/>
+interface Props {
+  searchParams: {
+    redirectTo?: string;
+  };
+}
 
-    </div>
-  );
+export default async function LoginPage({ searchParams }: Props) {
+  const redirectTo = safeRedirect(searchParams.redirectTo);
+
+  // Si ya tiene sesión (o acaba de ingresar), va directo a donde iba.
+  const session = await auth();
+  if (session?.user) {
+    redirect(redirectTo);
+  }
+
+  return <LoginForm redirectTo={redirectTo} />;
 }

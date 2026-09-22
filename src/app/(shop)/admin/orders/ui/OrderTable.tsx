@@ -1,329 +1,100 @@
 "use client";
 
-import React from "react";
-import { BsFillCartCheckFill } from "react-icons/bs";
-import { FaCashRegister } from "react-icons/fa";
-
-import {
-  MdOutlineCancel,
-  MdOutlineDeliveryDining,
-  MdOutlinePaid,
-} from "react-icons/md";
-import { TbChefHat } from "react-icons/tb";
+import { OrderControls } from "@/components/orders/OrderControls";
+import type { OrderStatus, Orders } from "@/interfaces/orders.interface";
+import { currencyFormat } from "@/utils/currency";
+import { formatShortDateTime } from "@/utils/date";
+import { formatOrderNumber, orderStatusLabel, paymentMethodLabel } from "@/utils/order-status";
+import clsx from "clsx";
 import Link from "next/link";
-import type { Orders } from "@/interfaces/orders.interface";
-
-
-import { format } from "date-fns";
-import { updateOrderprocess } from "@/actions/order/updateOrderprocess";
-import { updateOrdersIsReady } from "@/actions/order/updateOrderIsReady";
-import { updateOrdersisDelivered } from "@/actions/order/updateOrdersIsDelivered";
-import { updateOrdersIsPaid } from "@/actions/order/updateOrderIsPaid";
+import { useState } from "react";
 
 interface Props {
   orders: Orders[];
 }
 
+type Filter = "activos" | OrderStatus | "todos";
+
+const filters: { value: Filter; label: string }[] = [
+  { value: "activos", label: "Activos" },
+  { value: "pendiente", label: orderStatusLabel.pendiente },
+  { value: "preparando", label: orderStatusLabel.preparando },
+  { value: "en_camino", label: orderStatusLabel.en_camino },
+  { value: "entregado", label: orderStatusLabel.entregado },
+  { value: "cancelado", label: orderStatusLabel.cancelado },
+  { value: "todos", label: "Todos" },
+];
+
 const OrderTable = ({ orders }: Props) => {
+  const [filter, setFilter] = useState<Filter>("activos");
+
+  const visibleOrders = orders.filter((order) => {
+    if (filter === "todos") return true;
+    if (filter === "activos") {
+      return order.status !== "entregado" && order.status !== "cancelado";
+    }
+    return order.status === filter;
+  });
+
   return (
-    <table className="min-w-full">
-      <thead className="bg-gray-200 border-b">
-        <tr>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
+    <>
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
+        {filters.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => setFilter(option.value)}
+            className={clsx(
+              "shrink-0 rounded-full px-3 py-1 text-sm font-medium border",
+              filter === option.value
+                ? "bg-brand-green border-brand-green text-white"
+                : "bg-white border-brand-cream-dark"
+            )}
           >
-            #ID
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Mesa / Direccion de entrega
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Total
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Estado de la orden
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Estado del pago
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Orden creada
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            En proceso
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Listo para entrega
-          </th>
-          <th
-            scope="col"
-            className="text-sm font-medium text-gray-900 pl-1 py-4 text-center"
-          >
-            Entregado
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {orders.map((order) => (
-          <tr
-            key={order.id}
-            className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
-          >
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center">
-              <button
-                className={
-                  order.isDelivered && order.isPaid
-                    ? "btn-success"
-                    : "btn-primary"
-                }
-              >
-                <Link href={`/orders/${order.id}`} className="hover:underline">
-                  {order.id.split("-").at(1)}
-                </Link>
-              </button>
-            </td>
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              {order.address === "1" ||
-              order.address === "2" ||
-              order.address === "3" ||
-              order.address === "4" ? (
-                <span className="btn-mesa">Mesa: {order.address}</span>
-              ) : (
-                <div className=" ">
-                  <span className="btn-delivery mr-2 ">{order.address} </span>{" "}
-                  <span className="btn-delivery">{order.phone} </span>{" "}
-                </div>
-              )}
-            </td>
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              $ {order.total}
-            </td>
-            <td className="text-sm text-gray-900 font-light  pt-6 whitespace-nowrap flex justify-center">
-              {!order?.isOkforCook &&
-              !order?.isReadyForDelivery &&
-              !order?.isDelivered ? (
-                <div className="flex items-center">
-                  <FaCashRegister size={15}></FaCashRegister>
-                  <span className="mx-2">Por hacer</span>
-                  {order.isPaid === true ? (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-green-200 rounded-full">
-                        <MdOutlinePaid size={20} />
-                      </div>{" "}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-red-200 rounded-full">
-                        <MdOutlineCancel size={20} />
-                      </div>{" "}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                ""
-              )}
-              {order?.isOkforCook &&
-              !order?.isReadyForDelivery &&
-              !order?.isDelivered ? (
-                <div className="flex items-center">
-                  <TbChefHat size={15}></TbChefHat>
-                  <span className="mx-2">En proceso</span>
-                  {order.isPaid === true ? (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-green-200 rounded-full">
-                        <MdOutlinePaid size={20} />
-                      </div>{" "}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-red-200 rounded-full">
-                        <MdOutlineCancel size={20} />
-                      </div>{" "}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                ""
-              )}
-              {order?.isOkforCook &&
-              order?.isReadyForDelivery &&
-              !order?.isDelivered ? (
-                <div className="flex items-center">
-                  <MdOutlineDeliveryDining size={15}></MdOutlineDeliveryDining>
-                  <span className="mx-2">Yendo!</span>
-                  {order.isPaid === true ? (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-green-200 rounded-full">
-                        <MdOutlinePaid size={20} />
-                      </div>{" "}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-red-200 rounded-full">
-                        <MdOutlineCancel size={20} />
-                      </div>{" "}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                ""
-              )}
-              {order?.isOkforCook &&
-              order?.isReadyForDelivery &&
-              order?.isDelivered ? (
-                <div className="flex items-center">
-                  <BsFillCartCheckFill size={15}></BsFillCartCheckFill>
-                  <span className="mx-2">Enviado con éxito</span>
-                  {order.isPaid === true ? (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-green-200 rounded-full">
-                        <MdOutlinePaid size={20} />
-                      </div>{" "}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <span>| </span>{" "}
-                      <div className="bg-red-200 rounded-full">
-                        <MdOutlineCancel size={20} />
-                      </div>{" "}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                ""
-              )}
-            </td>
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              <div className="flex flex-col items-center gap-2">
-                <input
-                  type="checkbox"
-                  defaultChecked={order.isPaid}
-                  onChange={(e) =>
-                    updateOrdersIsPaid(
-                      order.id,
-          
-                      e.target.checked,
-
-                    )
-                  }
-                  className="text-sm"
-                />
-                <span className="text-xs">
-                  {order.DisPaid
-                    ? format(new Date(order.DisPaid), "HH:mm:ss-dd/MM ")
-                    : "-"}
-                </span>
-              </div>
-            </td>
-
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              <span className="text-xs">
-                {order.createdAt
-                  ? format(new Date(order.createdAt), "HH:mm:ss-dd/MM ")
-                  : "-"}
-              </span>
-            </td>
-
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              <div className="flex flex-col items-center gap-2">
-                <input
-                  type="checkbox"
-                  defaultChecked={order.isOkforCook}
-                  onChange={(e) =>
-                    updateOrderprocess(order.id, e.target.checked)
-                  }
-                  className="text-sm"
-                />
-
-                <span className="text-xs">
-                  {order.DisOkforCook
-                    ? format(new Date(order.DisOkforCook), "HH:mm:ss-dd/MM ")
-                    : "-"}
-                </span>
-              </div>
-            </td>
-
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              <div className="flex flex-col items-center gap-2">
-                <input
-                  type="checkbox"
-                  defaultChecked={order.isReadyForDelivery}
-                  onChange={(e) =>
-                    updateOrdersIsReady(
-                      order.id,
-
-                      e.target.checked
-                    )
-                  }
-                  className="text-sm"
-                />
-
-                <span className="text-xs">
-                  {order.DisReadyForDelivery
-                    ? format(
-                        new Date(order.DisReadyForDelivery),
-                        "HH:mm:ss-dd/MM "
-                      )
-                    : "-"}
-                </span>
-              </div>
-            </td>
-
-            <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-900">
-              <div className="flex flex-col items-center gap-2">
-                <input
-                  type="checkbox"
-                  defaultChecked={order.isDelivered}
-                  onChange={(e) =>
-                    updateOrdersisDelivered(
-                      order.id,
-
-                      e.target.checked
-                    )
-                  }
-                  className="text-sm"
-                />
-
-                <span className="text-xs">
-                  {order.DisDelivered
-                    ? format(new Date(order.DisDelivered), "HH:mm:ss-dd/MM ")
-                    : "-"}
-                </span>
-              </div>
-            </td>
-          </tr>
+            {option.label}
+          </button>
         ))}
-      </tbody>
-    </table>
+      </div>
+
+      {visibleOrders.length === 0 ? (
+        <div className="card p-8 text-center text-gray-600">No hay pedidos en esta vista.</div>
+      ) : (
+        <div className="card divide-y divide-brand-cream-dark">
+          {visibleOrders.map((order) => (
+            <div
+              key={order.id}
+              className="grid gap-3 px-4 py-4 md:grid-cols-[110px_1fr_120px_auto] md:items-center"
+            >
+              <div>
+                <Link href={`/orders/${order.id}`} className="font-bold text-brand-green hover:underline">
+                  {formatOrderNumber(order.number)}
+                </Link>
+                <p className="text-xs text-gray-500">{formatShortDateTime(order.createdAt)}</p>
+              </div>
+
+              <div className="min-w-0 text-sm">
+                <p className="font-semibold">
+                  {order.firstName} · <a href={`tel:${order.phone}`} className="font-normal underline">{order.phone}</a>
+                </p>
+                <p className="truncate">{order.address}</p>
+                {order.notes && <p className="truncate text-gray-500">{order.notes}</p>}
+              </div>
+
+              <div className="text-sm">
+                <p className="font-bold text-base">{currencyFormat(order.total)}</p>
+                <p className="text-gray-500">{paymentMethodLabel[order.paymentMethod]}</p>
+              </div>
+
+              <OrderControls
+                orderId={order.id}
+                status={order.status}
+                isPaid={order.isPaid}
+                compact
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 

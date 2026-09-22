@@ -8,10 +8,8 @@ interface State {
   getTotalitems: () => number;
   getSummaryInformation: () => {
     subTotal: number;
-    tax: number;
     total: number;
     itemsInCart: number;
-    totalWithDelivery: number;
   };
 
   addProductToCart: (product: CartProduct) => void;
@@ -21,6 +19,13 @@ interface State {
   clearCart: () => void;
 }
 
+// Un mismo producto puede estar varias veces en el carrito si cambia la
+// presentación (½ kg / 1 kg) o la variedad.
+const isSameItem = (a: CartProduct, b: CartProduct) =>
+  a.id === b.id &&
+  a.presentation === b.presentation &&
+  (a.variant ?? "") === (b.variant ?? "");
+
 export const useCartStore = create<State>()(
   persist(
     (set, get) => ({
@@ -28,91 +33,51 @@ export const useCartStore = create<State>()(
 
       getTotalitems: () => {
         const { cart } = get();
-
         return cart.reduce((total, item) => total + item.quantity, 0);
       },
 
       getSummaryInformation: () => {
         const { cart } = get();
 
-        const subTotal = cart.reduce((subtotal, product) => {
-          let price = product.price;
-
-          // Ajustar el precio según el tamaño del producto
-          if (product.size === "L") {
-            price *= 1.25; // Aumento del 25% para tamaño 'L'
-          } else if (product.size === "S") {
-            price *= 0.8; // Reducción del 20% para tamaño 'S'
-          }
-
-          return subtotal + product.quantity * price;
-        }, 0);
-
-        const delivery = 1000;
-        const tax = subTotal * 0;
-
-        const total = subTotal + tax;
-        const itemsInCart = cart.reduce(
-          (total, item) => total + item.quantity,
+        const subTotal = cart.reduce(
+          (subtotal, product) => subtotal + product.quantity * product.price,
           0
         );
-        const totalWithDelivery = total + delivery;
+        const itemsInCart = cart.reduce((total, item) => total + item.quantity, 0);
 
-        return {
-          subTotal,
-          tax,
-          total,
-          itemsInCart,
-          totalWithDelivery,
-        };
+        // El envío es gratis: el total es el subtotal.
+        return { subTotal, total: subTotal, itemsInCart };
       },
 
       addProductToCart: (product: CartProduct) => {
         const { cart } = get();
 
-        // 1. revisar si el producto existe en el carrito con la talla selecionada
-
-        const productInCart = cart.some(
-          (item) => item.id === product.id && item.size === product.size
-        );
-
-        if (!productInCart) {
+        if (!cart.some((item) => isSameItem(item, product))) {
           set({ cart: [...cart, product] });
           return;
         }
 
-        // 2. Se que el producto existe por tamaño... ahora hay que incrementarlo.
-
-        const updateCartProducts = cart.map((item) => {
-          if (item.id === product.id && item.size === product.size) {
-            return { ...item, quantity: item.quantity + product.quantity };
-          }
-          return item;
+        set({
+          cart: cart.map((item) =>
+            isSameItem(item, product)
+              ? { ...item, quantity: item.quantity + product.quantity }
+              : item
+          ),
         });
-
-        set({ cart: updateCartProducts });
       },
 
       updateProductQuantity: (product: CartProduct, quantity: number) => {
         const { cart } = get();
-
-        const updatedCartProducts = cart.map((item) => {
-          if (item.id === product.id && item.size === product.size) {
-            return { ...item, quantity: quantity };
-          }
-          return item;
+        set({
+          cart: cart.map((item) =>
+            isSameItem(item, product) ? { ...item, quantity } : item
+          ),
         });
-
-        set({ cart: updatedCartProducts });
       },
 
       removeProduct: (product: CartProduct) => {
         const { cart } = get();
-
-        const updatedCartProducts = cart.filter(
-          (item) => item.id !== product.id || item.size !== product.size
-        );
-        set({ cart: updatedCartProducts });
+        set({ cart: cart.filter((item) => !isSameItem(item, product)) });
       },
 
       clearCart: () => {
@@ -121,7 +86,7 @@ export const useCartStore = create<State>()(
     }),
 
     {
-      name: "shopping-cart",
+      name: "timonypumba-cart",
     }
   )
 );

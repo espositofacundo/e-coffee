@@ -3,151 +3,123 @@
 import { placeOrder } from "@/actions/order/place-order";
 import { useAddressStore } from "@/store/ui/address/address-store";
 import { useCartStore } from "@/store/ui/cart/cart-store";
+import { currencyFormat } from "@/utils/currency";
+import { paymentMethodLabel } from "@/utils/order-status";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
-import React, { useEffect, useState } from "react";
-import { CgCoffee } from "react-icons/cg";
-
+import { useEffect, useState } from "react";
 import { GrEdit } from "react-icons/gr";
+import { IoCheckmarkCircleOutline } from "react-icons/io5";
 
 const PlaceOrder = () => {
   const router = useRouter();
   const [loaded, setLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isPlacingOrdern, setisPlacingOrdern] = useState(false);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const address = useAddressStore((state) => state.address);
-
-  const { itemsInCart, subTotal, total, totalWithDelivery } = useCartStore(
-    (state) => state.getSummaryInformation()
-  );
   const cart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clearCart);
+  const { itemsInCart, subTotal, total } = useCartStore((state) =>
+    state.getSummaryInformation()
+  );
 
   useEffect(() => {
     setLoaded(true);
   }, []);
 
+  useEffect(() => {
+    if (!loaded || isPlacingOrder) return;
+    if (itemsInCart === 0) router.replace("/cart");
+    else if (!address.address) router.replace("/checkout/address");
+  }, [loaded, isPlacingOrder, itemsInCart, address.address, router]);
+
   const onPlaceOrder = async () => {
-    setisPlacingOrdern(true);
+    setIsPlacingOrder(true);
+    setErrorMessage("");
 
     const productsToOrder = cart.map((product) => ({
       productId: product.id,
       quantity: product.quantity,
-      size: product.size,
+      presentation: product.presentation,
+      variant: product.variant,
     }));
 
     const resp = await placeOrder(productsToOrder, address);
     if (!resp.ok) {
-      setisPlacingOrdern(false);
-      setErrorMessage(resp.message);
+      setIsPlacingOrder(false);
+      setErrorMessage(resp.message ?? "No se pudo registrar el pedido");
       return;
     }
 
+    router.replace("/orders/" + resp.order?.id + "?nuevo=1");
     clearCart();
-    router.push("/orders/" + resp.order?.id); // Navigate to /dashboard
   };
 
-  if (!loaded) {
-    return <p>Cargando...</p>;
-  }
+  if (!loaded) return <p className="text-gray-500">Cargando…</p>;
 
   return (
-    <>
-      <div className="bg-white rounded-xl shadow-xl p-7 h-fit">
-        <h2 className="text-2xl mb-2">Datos de la orden</h2>
+    <div className="card p-5 lg:sticky lg:top-24">
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="font-bold">Entrega</h2>
+        <Link href="/checkout/address" className="flex items-center gap-2 text-sm underline">
+          <GrEdit /> Editar
+        </Link>
+      </div>
+      <div className="text-sm space-y-0.5">
+        <p className="font-semibold">{address.firstName}</p>
+        <p>{address.address}</p>
+        <p>{address.phone}</p>
+        {address.notes && <p className="text-gray-600">{address.notes}</p>}
+        <p className="pt-1">
+          <span className="text-gray-600">Pago:</span>{" "}
+          {paymentMethodLabel[address.paymentMethod]}
+        </p>
+      </div>
 
-        <div className="mb-4 grid grid-cols-2">
-          <p>Nombre:</p>
-          <p className="text-right">{address.firstName}</p>
+      <div className="my-4 h-px bg-brand-cream-dark" />
 
-          <p>
-            {address.address === "1" ||
-            address.address === "2" ||
-            address.address === "3" ||
-            address.address === "4"
-              ? `N° de mesa:`
-              : "Direccion:"}{" "}
-          </p>
-          <p className="text-right">
-            {address.address === "1" ||
-            address.address === "2" ||
-            address.address === "3" ||
-            address.address === "4"
-              ? `Mesa ${address.address}`
-              : address.address}
-          </p>
-          <p>Celular:</p>
-          <p className="text-right">{address.phone}</p>
+      <div className="space-y-1.5 text-sm">
+        <div className="flex justify-between">
+          <span>Productos</span>
+          <span>{itemsInCart}</span>
         </div>
-        <div className="flex flex-col w-full  ">
-          <Link
-            href="/checkout/address"
-            className="font-bold flex w-full underline "
-          >
-            <GrEdit className="w-6 h-6 mr-3 " />
-            Upss! Quiero editar mis datos
-          </Link>
-        </div>
-
-        <div className="w-full h-px bg-gray-200 my-4 col-span-2" />
-
-        <h2 className="text-2xl mb-2">Resumen de orden</h2>
-        <div className="grid grid-cols-2">
-          <span>No. Productos</span>
-          <span className="text-right">{itemsInCart}</span>
-
+        <div className="flex justify-between">
           <span>Subtotal</span>
-          <span className="text-right">${subTotal}</span>
-          {address.address === "1" ||
-          address.address === "2" ||
-          address.address === "3" ||
-          address.address === "4" ? (
-            <></>
-          ) : (
-            <>
-              {" "}
-              <span className="">Delivery:</span>
-              <span className="text-right">
-                {totalWithDelivery - total}
-              </span>{" "}
-            </>
-          )}
-
-          <span className="mt-2 text-2xl">Total:</span>
-          <span className="mt-2 text-2xl text-right">
-            $
-            {address.address === "1" ||
-            address.address === "2" ||
-            address.address === "3" ||
-            address.address === "4"
-              ? total
-              : totalWithDelivery}
-          </span>
+          <span>{currencyFormat(subTotal)}</span>
         </div>
-        <div
-          className={
-            itemsInCart === 0
-              ? `mt-5 mb-2 w-full hidden `
-              : `mt-5 mb-2 w-full  `
-          }
-        >
-          <p className="text-red-500">{errorMessage}</p>
-
-          <button
-            onClick={onPlaceOrder}
-            className={clsx({
-              "btn-primary flex": !isPlacingOrdern,
-              "btn-disabled flex": isPlacingOrdern,
-            })}
-          >
-            <CgCoffee className="w-6 h-6 mr-1 " /> Confirmar Orden
-          </button>
+        <div className="flex justify-between">
+          <span>Envío</span>
+          <span className="font-semibold text-brand-green">Gratis</span>
         </div>
       </div>
-    </>
+      <div className="mt-3 pt-3 border-t border-brand-cream-dark flex justify-between text-xl font-bold">
+        <span>Total</span>
+        <span>{currencyFormat(total)}</span>
+      </div>
+
+      {errorMessage && (
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {errorMessage}
+        </p>
+      )}
+
+      <button
+        onClick={onPlaceOrder}
+        disabled={isPlacingOrder || itemsInCart === 0}
+        className={clsx("w-full mt-5 py-3", {
+          "btn-primary": !isPlacingOrder,
+          "btn-disabled": isPlacingOrder,
+        })}
+      >
+        <IoCheckmarkCircleOutline size={22} />
+        {isPlacingOrder ? "Enviando pedido…" : "Confirmar pedido"}
+      </button>
+      <p className="mt-2 text-xs text-center text-gray-500">
+        Los precios se confirman al registrar el pedido.
+      </p>
+    </div>
   );
 };
 

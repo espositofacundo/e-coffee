@@ -2,8 +2,10 @@
 
 import { login } from "@/actions/auth/login";
 import { registerUser } from "@/actions/auth/register";
-
-import React, { useState } from "react";
+import { titleFont } from "@/config/fonts";
+import clsx from "clsx";
+import Link from "next/link";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
 type FormInputs = {
@@ -11,54 +13,91 @@ type FormInputs = {
   password: string;
 };
 
-const Registerform = () => {
+interface Props {
+  redirectTo: string;
+}
+
+const Registerform = ({ redirectTo }: Props) => {
   const [errorMessage, setErrorMessage] = useState("");
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormInputs>();
-  const onSubmit: SubmitHandler<FormInputs> = async (data) => {
+
+  const onSubmit: SubmitHandler<FormInputs> = async ({ email, password }) => {
     setErrorMessage("");
-    const { email, password } = data;
     const resp = await registerUser(email, password);
     if (!resp.ok) {
+      setErrorMessage(resp.message ?? "No se pudo crear la cuenta");
       return;
     }
 
     await login(email.toLowerCase(), password);
-    window.location.replace("/checkout/address");
+    window.location.replace(redirectTo);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
-      <label htmlFor="email">Correo electrónico</label>
-      {errors.email?.type === "required" && (
-        <span className="text-red-500">El campo es requerido</span>
-      )}
-      <input
-        className="px-5 py-2 border bg-blue-200 rounded mb-5"
-        type="email"
-        {...register("email", { required: true })}
-        autoFocus
-      />
+    <form onSubmit={handleSubmit(onSubmit)} className="card p-6">
+      <h1 className={`${titleFont.className} text-3xl font-bold text-brand-green`}>
+        Crear cuenta
+      </h1>
+      <p className="mt-1 text-sm text-gray-600">
+        Con tu cuenta hacés pedidos y seguís su estado.
+      </p>
 
-      <label htmlFor="email">Contraseña</label>
+      <div className="mt-6 space-y-4">
+        <div>
+          <label htmlFor="email" className="label">
+            Email
+          </label>
+          <input
+            id="email"
+            className="input"
+            type="email"
+            autoComplete="email"
+            autoFocus
+            {...register("email", { required: true })}
+          />
+          {errors.email && <p className="mt-1 text-sm text-red-600">Ingresá tu email</p>}
+        </div>
 
-      {errors.password?.type === "pattern" && (
-        <span className="text-red-500">Debe tener al menos 6 digitos</span>
-      )}
-      {errors.password?.type === "required" && (
-        <span className="text-red-500">El campo es requerido</span>
-      )}
+        <div>
+          <label htmlFor="password" className="label">
+            Contraseña
+          </label>
+          <input
+            id="password"
+            className="input"
+            type="password"
+            autoComplete="new-password"
+            {...register("password", { required: true, minLength: 6 })}
+          />
+          {errors.password && (
+            <p className="mt-1 text-sm text-red-600">Mínimo 6 caracteres</p>
+          )}
+        </div>
 
-      <input
-        className="px-5 py-2 border bg-blue-200 rounded mb-5"
-        type="password"
-        {...register("password", { required: true, pattern: /^.{6,}$/ })}
-      />
+        {errorMessage && <p className="text-sm text-red-600">{errorMessage}</p>}
 
-      <button className="btn-primary">Registrate</button>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={clsx("w-full", isSubmitting ? "btn-disabled" : "btn-primary")}
+        >
+          {isSubmitting ? "Creando cuenta…" : "Crear cuenta"}
+        </button>
+      </div>
+
+      <p className="mt-5 text-center text-sm">
+        ¿Ya tenés cuenta?{" "}
+        <Link
+          href={`/auth/login?redirectTo=${encodeURIComponent(redirectTo)}`}
+          className="font-semibold underline"
+        >
+          Ingresá
+        </Link>
+      </p>
     </form>
   );
 };

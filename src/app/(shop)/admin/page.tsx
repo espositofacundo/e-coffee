@@ -1,13 +1,5 @@
-import React from 'react'
+import { redirect } from "next/navigation";
 
-const pageAdmin = () => {
-  return (
-    <div>
-      
-    </div>
-  )
+export default function AdminPage() {
+  redirect("/admin/orders");
 }
-
-export default pageAdmin
-
-

@@ -3,6 +3,8 @@
 
 .env
 /postgres/
+docker-compose.override.yml
+.playwright-mcp/
 
 # dependencies
 /node_modules

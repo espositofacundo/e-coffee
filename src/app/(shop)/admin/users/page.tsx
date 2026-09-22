@@ -1,15 +1,16 @@
 export const revalidate = 0;
-import Title from "@/components/ui/title/Title";
 
+import { getPaginatedUsers } from "@/actions/user/get-paginated-users";
+import Title from "@/components/ui/title/Title";
 import { redirect } from "next/navigation";
 import UsersTable from "./ui/UsersTable";
-import { getPaginatedUsers } from "@/actions/user/get-paginated-users";
-import Pagination from "@/components/ui/pagination/Pagination";
 
+export const metadata = {
+  title: "Usuarios",
+};
 
-
-export default async function OrdersPays() {
-  const { ok, users = [] } = await getPaginatedUsers();
+export default async function AdminUsersPage() {
+  const { ok, users = [], currentUserId } = await getPaginatedUsers();
 
   if (!ok) {
     redirect("/auth/login");
@@ -17,13 +18,19 @@ export default async function OrdersPays() {
 
   return (
     <>
-      <Title title="Users" />
-
-      <div className="mb-10">
-       <UsersTable users={users}></UsersTable>
-
-       <Pagination totalPages={2}></Pagination>
-      </div>
+      <Title
+        title="Usuarios"
+        subtitle="Los administradores pueden cargar productos y gestionar pedidos."
+      />
+      <UsersTable
+        users={users.map((user) => ({
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          orders: user._count.Order,
+        }))}
+        currentUserId={currentUserId}
+      />
     </>
   );
 }

@@ -1,170 +1,143 @@
 "use server";
 
-import prisma from "@/lib/prisma";
 import { auth } from "@/auth.config";
-import type { Address, Size } from "@/interfaces/product.interface";
-
+import type { Address } from "@/interfaces/orders.interface";
+import type { Presentation } from "@/interfaces/product.interface";
+import prisma from "@/lib/prisma";
+import { getPresentationPrice, presentationLabel } from "@/utils/presentation";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 interface ProductToOrder {
   productId: string;
   quantity: number;
-  size: Size;
+  presentation: Presentation;
+  variant?: string;
 }
 
+const itemsSchema = z
+  .array(
+    z.object({
+      productId: z.string().uuid(),
+      quantity: z.number().int().min(1).max(999),
+      presentation: z.enum(["medio_kg", "kg", "unidad"]),
+      variant: z.string().optional(),
+    })
+  )
+  .min(1, "El carrito está vacío");
+
+const addressSchema = z.object({
+  firstName: z.string().trim().min(2, "Falta el nombre"),
+  phone: z.string().trim().min(6, "Falta el teléfono"),
+  address: z.string().trim().min(3, "Falta la dirección"),
+  notes: z.string().trim().default(""),
+  paymentMethod: z.enum(["efectivo", "transferencia"]),
+});
+
 export const placeOrder = async (
-  productIds: ProductToOrder[],
+  productsToOrder: ProductToOrder[],
   address: Address
 ) => {
   const session = await auth();
   const userId = session?.user.id;
-
-  // aca verifico la session del usuario
   if (!userId) {
+    return { ok: false, message: "Tenés que iniciar sesión para hacer el pedido" };
+  }
+
+  // La sesión puede seguir activa aunque la cuenta ya no exista (ej. si se borró).
+  const userExists = await prisma.user.count({ where: { id: userId } });
+  if (!userExists) {
     return {
       ok: false,
-      message: "No hay sesión de usuario",
+      message: "Tu sesión expiró. Cerrá sesión y volvé a ingresar para confirmar el pedido.",
     };
   }
+
+  const itemsParsed = itemsSchema.safeParse(productsToOrder);
+  const addressParsed = addressSchema.safeParse(address);
+  if (!itemsParsed.success) {
+    return { ok: false, message: itemsParsed.error.issues[0].message };
+  }
+  if (!addressParsed.success) {
+    return { ok: false, message: addressParsed.error.issues[0].message };
+  }
+  const items = itemsParsed.data;
+  const delivery = addressParsed.data;
 
   const products = await prisma.product.findMany({
-    where: {
-      id: {
-        in: productIds.map((p) => p.productId),
-      },
-    },
+    where: { id: { in: items.map((item) => item.productId) } },
   });
 
-  // calcular los montos
-
-  const subTotal = productIds.reduce((subtotal, p) => {
-    const productIdToFind = p.productId;
-    const product = products.find((product) => product.id === productIdToFind);
-
-    let price = product?.price || 0;
-
-    // Ajustar el precio según el tamaño del producto
-    if (p.size === "L") {
-      price *= 1.25; // Aumento del 25% para tamaño 'L'
-    } else if (p.size === "S") {
-      price *= 0.8; // Reducción del 20% para tamaño 'S'
+  // Los precios se calculan acá, nunca se toman del carrito del cliente.
+  const orderItems = [];
+  for (const item of items) {
+    const product = products.find((p) => p.id === item.productId);
+    if (!product || !product.available) {
+      return {
+        ok: false,
+        message: `${product?.title ?? "Un producto"} ya no está disponible. Sacalo del carrito para continuar.`,
+      };
     }
 
-    return subtotal + p.quantity * price;
-  }, 0);
+    const price = getPresentationPrice(product, item.presentation);
+    if (price === null) {
+      return {
+        ok: false,
+        message: `${product.title} no se vende por ${presentationLabel[item.presentation]}`,
+      };
+    }
 
-  let Delivery = 0;
+    let variant: string | null = null;
+    if (product.variants.length > 0) {
+      if (!item.variant || !product.variants.includes(item.variant)) {
+        return {
+          ok: false,
+          message: `Elegí una variedad para ${product.title}`,
+        };
+      }
+      variant = item.variant;
+    }
 
-  if (address.address === "1" ||
-            address.address === "2" ||
-            address.address === "3" ||
-            address.address === "4") {
-    Delivery = 0; // No uses 'const' aquí para actualizar la variable externa
-  }else{
-    Delivery = 1500
+    orderItems.push({
+      productId: product.id,
+      quantity: item.quantity,
+      presentation: item.presentation,
+      variant,
+      price,
+    });
   }
 
-  const subtotaldelivery = subTotal + Delivery;
-
-  const percentTax = 0;
-
-  const tax = subtotaldelivery * percentTax;
-
-  const total = subtotaldelivery + tax;
-
-  const itemsInOrder = productIds.reduce((total, p) => {
-    return total + p.quantity;
-  }, 0);
+  const subtotal = orderItems.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0
+  );
+  const itemsInOrder = orderItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
 
   try {
-    const prismaTX = await prisma.$transaction(async (tx) => {
-      // 1. actualizar el stock de los productos.
-
-      const updatedProductsPromises = products.map(async (product) => {
-        const productQuantity = productIds
-          .filter((p) => p.productId === product.id)
-          .reduce((acc, item) => item.quantity + acc, 0);
-
-        if (productQuantity === 0) {
-          throw new Error(`${product.id}, no tiene cantidad definida`);
-        }
-
-        return tx.product.update({
-          where: { id: product.id },
-          data: {
-            inStock: {
-              decrement: productQuantity,
-            },
-          },
-        });
-      });
-
-      const updatedProducts = await Promise.all(updatedProductsPromises);
-
-      //verificar valores negativos
-      updatedProducts.forEach((product) => {
-        if (product.inStock < 0) {
-          throw new Error(`${product.title} no tiene stock.`);
-        }
-      });
-
-      // 2. crear la orden - encabezado- detalles.
-
-      const order = await tx.order.create({
-        data: {
-          userId: userId,
-          subtotal: subTotal,
-          tax: tax,
-          Delivery: Delivery,
-          total: total,
-          itemsInOrder: itemsInOrder,
-          firstName: address.firstName,
-          address: address.address,
-          phone: address.phone,
-
-          OrderItem: {
-            createMany: {
-              data: productIds.map((p) => {
-                const product = products.find(
-                  (product) => product.id === p.productId
-                );
-                if (!product) {
-                  throw new Error(`Producto no encontrado: ${p.productId}`);
-                }
-
-                let price = product.price || 0;
-                if (p.size === "L") {
-                  price *= 1.25; // Aumento del 25% para tamaño 'L'
-                } else if (p.size === "S") {
-                  price *= 0.8; // Reducción del 20% para tamaño 'S'
-                }
-
-                return {
-                  quantity: p.quantity,
-                  size: p.size,
-                  productId: p.productId,
-                  price: price,
-                };
-              }),
-            },
-          },
-        },
-      });
-
-      return {
-        order: order,
-        updateProducts: updatedProducts,
-      };
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        subtotal,
+        // El envío es gratis: el total es el subtotal.
+        total: subtotal,
+        itemsInOrder,
+        firstName: delivery.firstName,
+        phone: delivery.phone,
+        address: delivery.address,
+        notes: delivery.notes || null,
+        paymentMethod: delivery.paymentMethod,
+        OrderItem: { createMany: { data: orderItems } },
+      },
     });
 
-    return {
-      ok: true,
-      order: prismaTX.order,
-      prismaTX: prismaTX,
-    };
-  } catch (error: any) {
-    return {
-      ok: false,
-      message: error?.message,
-    };
+    revalidatePath("/orders");
+    revalidatePath("/admin/orders");
+    return { ok: true, order };
+  } catch (error) {
+    console.log(error);
+    return { ok: false, message: "No se pudo registrar el pedido" };
   }
 };

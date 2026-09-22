@@ -4,16 +4,12 @@ import prisma from "@/lib/prisma";
 
 export const getProductbySlug = async (slug: string) => {
   try {
-    //aca obtentengo el producto
-
     const product = await prisma.product.findFirst({
       include: {
-        ProductImage: true
-      
+        ProductImage: true,
+        category: { select: { name: true } },
       },
-      where: {
-        slug: slug,
-      },
+      where: { slug },
     });
 
     if (!product) return null;
@@ -24,6 +20,6 @@ export const getProductbySlug = async (slug: string) => {
     };
   } catch (error) {
     console.log(error);
-    throw new Error("Error al obterner el producto");
+    throw new Error("Error al obtener el producto");
   }
 };

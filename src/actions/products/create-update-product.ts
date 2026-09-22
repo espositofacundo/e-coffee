@@ -1,133 +1,117 @@
 "use server";
+
+import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
-import { Product, Rootcategory, Size } from "@prisma/client";
+import { slugify } from "@/utils/slugify";
+import { Prisma, SaleUnit } from "@prisma/client";
+import { v2 as cloudinary } from "cloudinary";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config(process.env.CLOUDINARY_URL ?? "");
 
+const emptyToNull = (value: unknown) =>
+  value === "" || value === undefined || value === null ? null : value;
+
 const productSchema = z.object({
   id: z.string().uuid().optional().nullable(),
-  title: z.string().min(1).max(255),
-  slug: z.string().min(1).max(255),
-  description: z.string(),
+  title: z.string().trim().min(1).max(255),
+  slug: z.string().trim().max(255).default(""),
+  description: z.string().trim().default(""),
+  categoryId: z.string().uuid(),
+  unit: z.nativeEnum(SaleUnit),
   price: z.coerce
     .number()
     .min(0)
-    .transform((val) => Number(val.toFixed(0))),
-  inStock: z.coerce
-    .number()
-    .min(0)
-    .transform((val) => Number(val.toFixed(0))),
-  categoryId: z.string().uuid(),
-  sizes: z.coerce.string().transform((val) => val.split(",")),
-  tags: z.string(),
-  rootcategory: z.nativeEnum(Rootcategory),
+    .transform((val) => Math.round(val)),
+  priceHalf: z.preprocess(
+    emptyToNull,
+    z.coerce
+      .number()
+      .min(0)
+      .transform((val) => Math.round(val))
+      .nullable()
+  ),
+  variants: z.string().default(""),
+  available: z.preprocess((value) => value === "true", z.boolean()),
 });
 
 export const createdUpdateProduct = async (formData: FormData) => {
-  const data = Object.fromEntries(formData);
-  const productParsed = productSchema.safeParse(data);
+  const session = await auth();
+  if (session?.user.role !== "admin") {
+    return { ok: false, message: "No permitido" };
+  }
 
+  const productParsed = productSchema.safeParse(Object.fromEntries(formData));
   if (!productParsed.success) {
     console.log(productParsed.error);
-    return { ok: false };
+    return { ok: false, message: "Revisá los datos del producto" };
   }
-  const product = productParsed.data;
-  product.slug = product.slug.toLowerCase().replace(/ /g, "-").trim();
 
-  const { id, ...rest } = product;
+  const { id, variants, ...rest } = productParsed.data;
+  const data = {
+    ...rest,
+    slug: slugify(rest.slug || rest.title),
+    // Los productos por unidad no tienen precio por ½ kg.
+    priceHalf: rest.unit === "unidad" ? null : rest.priceHalf,
+    variants: variants
+      .split(",")
+      .map((variant) => variant.trim())
+      .filter(Boolean),
+  };
 
+  let product;
   try {
-    const prismaTx = await prisma.$transaction(async (tx) => {
-      let product: Product;
-      const tagsArray = rest.tags
-        .split(",")
-        .map((tag) => tag.trim().toLowerCase());
-
-      if (id) {
-        product = await prisma.product.update({
-          where: { id },
-          data: {
-            ...rest,
-            sizes: {
-              set: rest.sizes as Size[],
-            },
-            tags: {
-              set: tagsArray,
-            },
-          },
-        });
-      } else {
-        product = await prisma.product.create({
-          data: {
-            ...rest,
-            sizes: {
-              set: rest.sizes as Size[],
-            },
-            tags: {
-              set: tagsArray,
-            },
-          },
-        });
-      }
-
-      if (formData.getAll("images")) {
-        const images = await uploadImages(formData.getAll("images") as File[]);
-        if(!images){
-          throw new Error('No se pudo cargar las imagenes')
-        }
-
-        await prisma.productImage.createMany({
-          data: images.map(image =>({
-            url:image!,
-            productId: product.id,
-
-          }))
-        });
-
-        
-      }
-
-      return {
-        product,
-      };
-    });
-
-    revalidatePath("/admin/products");
-    revalidatePath(`/admin/products/${product.slug}`);
-    revalidatePath(`/products/${product.slug}`);
-    return {
-      ok: true,
-      product: prismaTx.product,
-    };
+    product = id
+      ? await prisma.product.update({ where: { id }, data })
+      : await prisma.product.create({ data });
   } catch (error) {
-    return {
-      ok: false,
-      message: "no se pudo actualizar",
-    };
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      return { ok: false, message: `Ya existe un producto con el slug "${data.slug}"` };
+    }
+    console.log(error);
+    return { ok: false, message: "No se pudo guardar el producto" };
   }
+
+  revalidatePath("/");
+  revalidatePath("/admin/products");
+  revalidatePath(`/product/${product.slug}`);
+
+  const files = (formData.getAll("images") as File[]).filter(
+    (file) => file.size > 0
+  );
+  if (files.length > 0) {
+    const images = await uploadImages(files);
+    if (!images) {
+      return {
+        ok: false,
+        product,
+        message: "El producto se guardó, pero no se pudieron subir las fotos",
+      };
+    }
+    await prisma.productImage.createMany({
+      data: images.map((url) => ({ url, productId: product.id })),
+    });
+  }
+
+  return { ok: true, product };
 };
 
 const uploadImages = async (images: File[]) => {
   try {
-    const uploadPromises = images.map(async (image) => {
-      try {
+    return await Promise.all(
+      images.map(async (image) => {
         const buffer = await image.arrayBuffer();
         const base64Image = Buffer.from(buffer).toString("base64");
-
-        return cloudinary.uploader
-          .upload(`data:image/png;base64,${base64Image}`)
-          .then(r => r.secure_url);
-      } catch (error) {
-        console.log(error);
-        return null;
-      }
-    });
-
-    const uploadedImages = await Promise.all(uploadPromises);
-    return uploadedImages;
+        const result = await cloudinary.uploader.upload(
+          `data:${image.type || "image/png"};base64,${base64Image}`
+        );
+        return result.secure_url;
+      })
+    );
   } catch (error) {
     console.log(error);
     return null;

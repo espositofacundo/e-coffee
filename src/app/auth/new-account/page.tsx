@@ -1,10 +1,25 @@
+import { auth } from "@/auth.config";
+import { safeRedirect } from "@/utils/safe-redirect";
+import { redirect } from "next/navigation";
 import Registerform from "./ui/Registerform";
 
-export default function RegisterPage() {
-  return (
-    <div className="flex flex-col min-h-screen pt-20 sm:pt-30">
-      <h1 className="text-4xl mb-10">Nueva cuenta</h1>
-      <Registerform/>
-    </div>
-  );
+export const metadata = {
+  title: "Crear cuenta",
+};
+
+interface Props {
+  searchParams: {
+    redirectTo?: string;
+  };
+}
+
+export default async function RegisterPage({ searchParams }: Props) {
+  const redirectTo = safeRedirect(searchParams.redirectTo);
+
+  const session = await auth();
+  if (session?.user) {
+    redirect(redirectTo);
+  }
+
+  return <Registerform redirectTo={redirectTo} />;
 }

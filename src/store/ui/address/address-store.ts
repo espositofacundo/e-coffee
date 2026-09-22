@@ -1,32 +1,28 @@
+import type { Address } from "@/interfaces/orders.interface";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 interface State {
-  address: {
-    firstName: string;
-    address: string;
-    phone: string;
-    
-  };
-
-  setAddress: (address:State['address'])=> void;
+  address: Address;
+  setAddress: (address: Address) => void;
 }
 
 export const useAddressStore = create<State>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       address: {
         firstName: "",
-        address: "",
         phone: "",
-        
+        address: "",
+        notes: "",
+        paymentMethod: "efectivo",
       },
-      setAddress:(address) => {
-        set({address})
+      setAddress: (address) => {
+        set({ address });
       },
     }),
     {
-      name: "address-storage",
+      name: "timonypumba-address",
     }
   )
 );

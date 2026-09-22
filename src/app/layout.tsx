@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { inter } from "@/config/fonts";
+import { bodyFont } from "@/config/fonts";
+import { store } from "@/config/store";
 import Footer from "@/components/ui/footer/Footer";
 import Provider from "@/components/provider/Provider";
+import TopMenu from "@/components/ui/top-menu/topMenu";
+import Sidebar from "@/components/ui/sidebar/Sidebar";
 
 export const metadata: Metadata = {
   title: {
-    template:'%s - E-coffee',
-    default:'E-coffee'
+    template: `%s - ${store.name}`,
+    default: `${store.name} | Frutos secos y alimentos naturales`,
   },
-  description: "Una tienda de cafe y delicias",
+  description: store.description,
 };
 
 export default function RootLayout({
@@ -18,13 +21,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="es">
+      <body className={`${bodyFont.className} min-h-screen flex flex-col`}>
         <Provider>
-        {children}
+          <TopMenu />
+          <Sidebar />
+          <div className="flex-1">{children}</div>
+          <Footer />
         </Provider>
-        
-        <Footer></Footer>
       </body>
     </html>
   );

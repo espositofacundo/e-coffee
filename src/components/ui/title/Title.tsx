@@ -8,13 +8,13 @@ interface Props {
 
 const Title = ({ title, subtitle }: Props) => {
   return (
-    <div className="">
+    <div className="mt-8 mb-6">
       <h1
-        className={`${titleFont.className} antialiased text-4xl font-semibold my-7 uppercase`}
+        className={`${titleFont.className} antialiased text-3xl sm:text-4xl font-bold text-brand-green`}
       >
         {title}
       </h1>
-      {subtitle && <h3 className="text-xl mb-10">{subtitle}</h3>}
+      {subtitle && <p className="mt-1 text-gray-600">{subtitle}</p>}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 {
-  "name": "e-coffe",
+  "name": "timonypumba",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,15 +15,12 @@
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.2.0",
     "clsx": "^2.1.0",
-    "date-fns": "^3.6.0",
     "next": "14.2.1",
     "next-auth": "^5.0.0-beta.17",
-    "numeral": "^2.0.6",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.51.3",
     "react-icons": "^5.1.0",
-    "react-router-dom": "^6.23.0",
     "swiper": "^11.1.1",
     "zod": "^3.23.4",
     "zustand": "^4.5.2"

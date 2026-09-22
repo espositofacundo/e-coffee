@@ -1,127 +1,64 @@
 export const revalidate = 0;
 
 import { getOrdersByUser } from "@/actions/order/get-order-by-user";
+import { OrderStatusBadge, PaidBadge } from "@/components/orders/OrderStatusBadge";
 import Title from "@/components/ui/title/Title";
+import { currencyFormat } from "@/utils/currency";
+import { formatOrderNumber } from "@/utils/order-status";
+import { formatDateTime } from "@/utils/date";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { BsFillCartCheckFill } from "react-icons/bs";
-import { FaCashRegister } from "react-icons/fa";
-import { IoCardOutline } from "react-icons/io5";
-import { MdOutlineDeliveryDining } from "react-icons/md";
-import { TbChefHat } from "react-icons/tb";
+import { IoChevronForward } from "react-icons/io5";
 
-export default async function OrdersPays() {
+export const metadata = {
+  title: "Mis pedidos",
+};
+
+export default async function OrdersPage() {
   const { ok, orders = [] } = await getOrdersByUser();
 
   if (!ok) {
-    redirect("/auth/login");
+    redirect("/auth/login?redirectTo=/orders");
   }
 
   return (
     <>
-      <Title title="Orders" />
+      <Title title="Mis pedidos" />
 
-      <div className="mb-10">
-        <table className="min-w-full">
-          <thead className="bg-gray-200 border-b">
-            <tr>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                #ID
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                Estado de la orden
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                Estado del pago
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id} className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100">
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  <button className="btn-primary ">
-                    <Link
-                      href={`/orders/${order.id}`}
-                      className="hover:underline"
-                    >
-                      {order.id.split("-").at(1)}
-                    </Link>
-                  </button>
-                </td>
-                <td className="text-sm text-gray-900 font-light pl-1 py-4 whitespace-nowrap">
-                  {!order?.isOkforCook &&
-                  !order?.isReadyForDelivery &&
-                  !order?.isDelivered ? (
-                    <div className="flex items-center">
-                      <FaCashRegister size={15}></FaCashRegister>
-                      <span className="mx-2">Por hacer</span>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                  {order?.isOkforCook &&
-                  !order?.isReadyForDelivery &&
-                  !order?.isDelivered ? (
-                    <div className="flex items-center">
-                      <TbChefHat size={15}></TbChefHat>
-                      <span className="mx-2">En proceso</span>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                  {order?.isOkforCook &&
-                  order?.isReadyForDelivery &&
-                  !order?.isDelivered ? (
-                    <div className="flex items-center">
-                      <MdOutlineDeliveryDining
-                        size={15}
-                      ></MdOutlineDeliveryDining>
-                      <span className="mx-2">Yendo!</span>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                  {order?.isOkforCook &&
-                  order?.isReadyForDelivery &&
-                  order?.isDelivered ? (
-                    <div className="flex items-center">
-                      <BsFillCartCheckFill size={15}></BsFillCartCheckFill>
-                      <span className="mx-2">Enviado con éxito</span>
-                    </div>
-                  ) : (
-                    ""
-                  )}
-                </td>
-
-                {order.isPaid ? (
-                  <td className="flex items-center text-sm  text-gray-900 font-light pl-1 py-4 whitespace-nowrap">
-                    <IoCardOutline className="text-green-800" />
-                    <span className="mx-2 text-green-800">Pagada</span>
-                  </td>
-                ) : (
-                  <td className="flex items-center text-sm  text-gray-900 font-light pl-1 py-4 whitespace-nowrap">
-                    <IoCardOutline className="text-red-800" />
-                    <span className="mx-2 text-red-800">No Pagada</span>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {orders.length === 0 ? (
+        <div className="card p-10 text-center">
+          <p className="text-lg font-semibold">Todavía no hiciste pedidos</p>
+          <Link href="/" className="btn-primary mt-5">
+            Ver catálogo
+          </Link>
+        </div>
+      ) : (
+        <div className="card divide-y divide-brand-cream-dark">
+          {orders.map((order) => (
+            <Link
+              key={order.id}
+              href={`/orders/${order.id}`}
+              className="flex items-center gap-4 px-4 py-4 hover:bg-brand-cream/60"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-bold">
+                    Pedido {formatOrderNumber(order.number)}
+                  </span>
+                  <OrderStatusBadge status={order.status} />
+                  <PaidBadge isPaid={order.isPaid} />
+                </div>
+                <p className="text-sm text-gray-600 mt-0.5">
+                  {formatDateTime(order.createdAt)} ·{" "}
+                  {order.itemsInOrder} productos
+                </p>
+              </div>
+              <span className="font-bold">{currencyFormat(order.total)}</span>
+              <IoChevronForward className="text-gray-400" />
+            </Link>
+          ))}
+        </div>
+      )}
     </>
   );
 }
-
-
-

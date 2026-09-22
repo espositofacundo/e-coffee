@@ -1,31 +1,40 @@
-'use client';
+"use client";
 
-import { IoAddCircleOutline, IoRemoveCircleOutline } from 'react-icons/io5';
+import { IoAdd, IoRemove } from "react-icons/io5";
 
-interface Props{
-    quantity:number;
-    onQuantityChange: (value:number)=> void;
+interface Props {
+  quantity: number;
+  onQuantityChange: (value: number) => void;
 }
 
-const QuantitySelector = ({quantity,onQuantityChange}:Props) => {
+const QuantitySelector = ({ quantity, onQuantityChange }: Props) => {
+  const onValueChanged = (value: number) => {
+    if (quantity + value < 1) return;
+    onQuantityChange(quantity + value);
+  };
 
-
-    const onValueChanged =(value:number)=>{
-        if(quantity + value < 1) return;
-        onQuantityChange(quantity + value);
-
-    }
   return (
-    <div className='flex'>
-      <button onClick={()=>onValueChanged(-1)}>
-        <IoRemoveCircleOutline size={30} className='bg-red-200 rounded-full'/>
+    <div className="inline-flex items-center rounded-lg border border-brand-cream-dark bg-white">
+      <button
+        type="button"
+        onClick={() => onValueChanged(-1)}
+        className="p-2 hover:bg-brand-cream-dark rounded-l-lg disabled:opacity-40"
+        disabled={quantity <= 1}
+        aria-label="Restar uno"
+      >
+        <IoRemove size={18} />
       </button>
-      <span className='flex justify-center w-12 mx-3 px-5 bg-blue-200 text-center rounded-md pt-1'>{quantity}</span>
-      <button onClick={()=>onValueChanged(+1)}>
-        <IoAddCircleOutline size={30} className='bg-green-200 rounded-full'/>
+      <span className="w-10 text-center font-semibold">{quantity}</span>
+      <button
+        type="button"
+        onClick={() => onValueChanged(+1)}
+        className="p-2 hover:bg-brand-cream-dark rounded-r-lg"
+        aria-label="Sumar uno"
+      >
+        <IoAdd size={18} />
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default QuantitySelector
+export default QuantitySelector;

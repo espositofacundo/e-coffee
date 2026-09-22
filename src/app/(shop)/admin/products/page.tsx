@@ -1,119 +1,33 @@
 export const revalidate = 0;
 
+import { getAdminProducts } from "@/actions/products/get-admin-products";
 import Title from "@/components/ui/title/Title";
-
-
-
-import Pagination from "@/components/ui/pagination/Pagination";
-import { getPaginatedProductsWithImages } from "@/actions";
 import Link from "next/link";
-import Image from "next/image";
-import ProductImage from "@/components/product/product-image/productImage";
+import { redirect } from "next/navigation";
+import { IoAdd } from "react-icons/io5";
+import ProductsTable from "./ui/ProductsTable";
 
-interface Props {
-  searchParams: {
-    page?: string;
-  };
-}
+export const metadata = {
+  title: "Productos",
+};
 
-export default async function ProductPage({ searchParams }: Props) {
-  const page = searchParams.page ? parseInt(searchParams.page) : 1;
-  const { products, currentPage, totalPages } =
-    await getPaginatedProductsWithImages({ page });
+export default async function AdminProductsPage() {
+  const { ok, products } = await getAdminProducts();
+
+  if (!ok) {
+    redirect("/auth/login");
+  }
 
   return (
     <>
-      <Title title="Products" />
-      <div className="flex justify-end mb-5">
-        <Link href="/admin/product/new" className="btn-primary">
-          Nuevo producto
+      <div className="flex items-end justify-between gap-4">
+        <Title title="Productos" subtitle={`${products.length} productos cargados`} />
+        <Link href="/admin/product/new" className="btn-primary mb-6 shrink-0">
+          <IoAdd size={20} /> Nuevo producto
         </Link>
       </div>
 
-      <div className="mb-10">
-        <table className="min-w-full">
-          <thead className="bg-gray-200 border-b">
-            <tr>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                Imagen
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                Titulo
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                precio
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                categoria
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                Stock
-              </th>
-              <th
-                scope="col"
-                className="text-sm font-medium text-gray-900 pl-1 py-4 text-left"
-              >
-                tamaños disponibles
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr
-                key={product.id}
-                className="bg-white border-b transition duration-300 ease-in-out hover:bg-gray-100"
-              >
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  <Link href={`/product/${product.slug}`}>
-               
-                    <ProductImage
-                      src={product.ProductImage[0]?.url}
-                      width={80}
-                      height={80}
-                      alt={product.title}
-                      className="w-20 h-20 object-cover rounded"
-                    ></ProductImage>
-                  </Link>
-                </td>
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  <Link className="hover:underline" href={`/admin/product/${product.slug}`}>
-                    {product.title}
-                  </Link>
-                </td>
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  ${product.price}
-                </td>
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {product.rootcategory}
-                </td>
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {product.inStock}
-                </td>
-                <td className="pl-1 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {product.sizes.join(', ')}
-                </td>
-                
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <Pagination totalPages={totalPages}></Pagination>
+      <ProductsTable products={products} />
     </>
   );
 }

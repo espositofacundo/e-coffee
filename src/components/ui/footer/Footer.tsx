@@ -1,36 +1,60 @@
-import Link from "next/link";
-import React from "react";
-import { CgCoffee } from "react-icons/cg";
 import { titleFont } from "@/config/fonts";
-import { FaMapMarkerAlt } from "react-icons/fa";
+import { store } from "@/config/store";
+import Image from "next/image";
 import { BsWhatsapp } from "react-icons/bs";
+import { MdOutlineLocalShipping } from "react-icons/md";
 
 export default function Footer() {
   return (
-    <div className="grid grid-cols-1 w-full  text-xs mb-10">
-      <Link href="/" className="flex justify-center">
-        <span
-          className={`${titleFont.className} antialiased font-bold flex items-center`}
-        >
-          <CgCoffee className="w-6 h-6 mr-1" />
-        </span>
-        <span className="mr-1">|</span>
-        <span className="bg-green-200 p-1 rounded">E-coffee</span>
-      </Link>
-      <div className="flex justify-center pt-3 ">
-      <span className="px-2">© {new Date().getFullYear()} . All rights reserved.  |  </span>
-      <span className="px-2">Privacidad & legal  |  </span>
-      <div className="flex px-2">
-      <FaMapMarkerAlt />
-      <span className="pl-2">Nuestra tienda  |  </span>
-      </div>
-      <div className="flex px-2">
-      <BsWhatsapp />
-      <span className="pl-2">Escribinos</span>
-      </div>
+    <footer className="bg-brand-green text-white">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 grid gap-8 sm:grid-cols-3">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.png"
+            alt={store.name}
+            width={300}
+            height={234}
+            className="rounded-lg h-[60px] w-auto"
+          />
+          <div>
+            <p className={`${titleFont.className} text-xl font-bold`}>
+              {store.name}
+            </p>
+            <p className="text-sm text-white/80">{store.tagline}</p>
+          </div>
+        </div>
 
+        <div>
+          <p className="font-semibold mb-2">Hacé tu pedido</p>
+          <ul className="space-y-2">
+            {store.contacts.map((contact) => (
+              <li key={contact.whatsapp}>
+                <a
+                  href={`https://wa.me/${contact.whatsapp}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:underline"
+                >
+                  <BsWhatsapp />
+                  <span className="font-semibold">{contact.name}:</span>
+                  {contact.phone}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="flex items-start gap-2">
+          <MdOutlineLocalShipping size={24} className="shrink-0" />
+          <div>
+            <p className="font-semibold">Envíos a domicilio</p>
+            <p className="text-sm text-white/80">El envío es gratis en todos los pedidos.</p>
+          </div>
+        </div>
       </div>
-     
-    </div>
+      <div className="border-t border-white/15 py-4 text-center text-xs text-white/70">
+        © {new Date().getFullYear()} {store.name}
+      </div>
+    </footer>
   );
 }

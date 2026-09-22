@@ -11,13 +11,16 @@ export const getPaginatedUsers = async () => {
       message: "Debe de ser un usuario administrador",
     };
   }
+
   const users = await prisma.user.findMany({
-    orderBy: {
-      email: "desc"
+    orderBy: { email: "asc" },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      _count: { select: { Order: true } },
     },
   });
-  return{
-    ok:true,
-    users:users
-  }
+
+  return { ok: true, users, currentUserId: session.user.id };
 };
