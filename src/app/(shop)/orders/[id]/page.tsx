@@ -60,7 +60,9 @@ export default async function OrderPage({ params, searchParams }: Props) {
           <div>
             <p className="font-bold text-brand-green">¡Recibimos tu pedido!</p>
             <p className="text-sm">
-              Mandanos el detalle por WhatsApp para coordinar la entrega.
+              Te contactamos para coordinar la entrega. Si querés, mandanos el detalle por
+              WhatsApp. Podés volver a ver este pedido desde <strong>Mis pedidos</strong>, en el
+              menú.
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import { placeOrder } from "@/actions/order/place-order";
 import { useAddressStore } from "@/store/ui/address/address-store";
 import { useCartStore } from "@/store/ui/cart/cart-store";
+import { useMyOrdersStore } from "@/store/ui/orders/my-orders-store";
 import { currencyFormat } from "@/utils/currency";
 import { paymentMethodLabel } from "@/utils/order-status";
 import clsx from "clsx";
@@ -21,6 +22,7 @@ const PlaceOrder = () => {
   const address = useAddressStore((state) => state.address);
   const cart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clearCart);
+  const addOrder = useMyOrdersStore((state) => state.addOrder);
   const { itemsInCart, subTotal, total } = useCartStore((state) =>
     state.getSummaryInformation()
   );
@@ -53,6 +55,8 @@ const PlaceOrder = () => {
       return;
     }
 
+    // Se guarda en el navegador para que lo vea en "Mis pedidos" aunque no tenga cuenta.
+    if (resp.order?.id) addOrder(resp.order.id);
     router.replace("/orders/" + resp.order?.id + "?nuevo=1");
     clearCart();
   };

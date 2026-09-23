@@ -80,10 +80,11 @@ const Sidebar = () => {
 
         <SidebarLink href="/" icon={IoLeafOutline} label="Catálogo" onClick={closeMenu} />
         <SidebarLink href="/cart" icon={IoCartOutline} label="Mi carrito" onClick={closeMenu} />
+        {/* También sin cuenta: ahí ve los pedidos hechos desde este navegador. */}
+        <SidebarLink href="/orders" icon={IoReceiptOutline} label="Mis pedidos" onClick={closeMenu} />
 
         {isAuthenticated && (
           <>
-            <SidebarLink href="/orders" icon={IoReceiptOutline} label="Mis pedidos" onClick={closeMenu} />
             <SidebarLink href="/profile" icon={IoPersonOutline} label="Mi cuenta" onClick={closeMenu} />
             <button
               className="w-full flex items-center gap-3 px-3 py-3 rounded-lg hover:bg-brand-cream-dark transition-colors"

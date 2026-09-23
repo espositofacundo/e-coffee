@@ -4,6 +4,7 @@ import { auth } from "@/auth.config";
 import type { Address } from "@/interfaces/orders.interface";
 import type { Presentation } from "@/interfaces/product.interface";
 import prisma from "@/lib/prisma";
+import { notifyNewOrder } from "@/lib/whatsapp-notify";
 import { getPresentationPrice, presentationLabel } from "@/utils/presentation";
 import { stockByProduct } from "@/utils/stock";
 import { revalidatePath } from "next/cache";
@@ -39,20 +40,14 @@ export const placeOrder = async (
   productsToOrder: ProductToOrder[],
   address: Address
 ) => {
-  const session = await auth();
-  const userId = session?.user.id;
-  if (!userId) {
-    return { ok: false, message: "Tenés que iniciar sesión para hacer el pedido" };
-  }
-
+  // No hace falta tener cuenta: si hay sesión, el pedido queda asociado a ella.
   // La sesión puede seguir activa aunque la cuenta ya no exista (ej. si se borró).
-  const userExists = await prisma.user.count({ where: { id: userId } });
-  if (!userExists) {
-    return {
-      ok: false,
-      message: "Tu sesión expiró. Cerrá sesión y volvé a ingresar para confirmar el pedido.",
-    };
-  }
+  const session = await auth();
+  const sessionUserId = session?.user.id;
+  const userId =
+    sessionUserId && (await prisma.user.count({ where: { id: sessionUserId } }))
+      ? sessionUserId
+      : null;
 
   const itemsParsed = itemsSchema.safeParse(productsToOrder);
   const addressParsed = addressSchema.safeParse(address);
@@ -147,6 +142,14 @@ export const placeOrder = async (
     revalidatePath("/orders");
     revalidatePath("/admin/orders");
     revalidatePath("/admin/products");
+
+    // El aviso nunca puede hacer fallar un pedido ya registrado.
+    try {
+      await notifyNewOrder(order);
+    } catch (error) {
+      console.log("No se pudo avisar por WhatsApp:", error);
+    }
+
     return { ok: true, order };
   } catch (error) {
     console.log(error);

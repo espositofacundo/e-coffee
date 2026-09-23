@@ -4,11 +4,6 @@ import { auth } from "@/auth.config";
 import prisma from "@/lib/prisma";
 
 export const getOrderById = async (id: string) => {
-  const session = await auth();
-  if (!session?.user) {
-    return { ok: false, message: "Debe de estar autenticado" };
-  }
-
   try {
     const order = await prisma.order.findUnique({
       where: { id },
@@ -34,8 +29,14 @@ export const getOrderById = async (id: string) => {
 
     if (!order) throw `${id} no existe`;
 
-    if (session.user.role !== "admin" && session.user.id !== order.userId) {
-      throw `${id} no corresponde a este usuario.`;
+    // Un pedido sin cuenta lo ve cualquiera que tenga el link: el id es la llave.
+    // Si es de una cuenta, solo esa cuenta o un administrador.
+    if (order.userId !== null) {
+      const session = await auth();
+      const isAdmin = session?.user.role === "admin";
+      if (!isAdmin && session?.user.id !== order.userId) {
+        throw `${id} no corresponde a este usuario.`;
+      }
     }
 
     return { ok: true, order };

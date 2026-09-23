@@ -48,6 +48,8 @@ Con `SEED_ADMINS` el seed crea solo esos administradores, sin los usuarios de pr
 
 **Productos.** Cada producto se vende por kilo (con precio opcional por ½ kg) o por unidad. Puede tener variedades, por ejemplo sabores; en ese caso el cliente tiene que elegir una al pedir. Un producto marcado "Sin stock" deja de aparecer en el catálogo.
 
-**Pedidos.** El cliente tiene que tener cuenta para confirmar. El envío es gratis. Los precios siempre se recalculan en el servidor al registrar el pedido. Estados del pedido: Recibido → Preparando → En camino → Entregado (o Cancelado). El pago se marca aparte.
+**Pedidos.** No hace falta tener cuenta: alcanza con nombre, teléfono y dirección. Los pedidos de invitados quedan guardados en su navegador y se abren con el link del pedido. Si el cliente tiene cuenta, el pedido queda asociado a ella. El envío es gratis. Los precios siempre se recalculan en el servidor al registrar el pedido. Estados del pedido: Recibido → Preparando → En camino → Entregado (o Cancelado). El pago se marca aparte.
+
+**Avisos.** Cada pedido nuevo se avisa por WhatsApp a los números de `WHATSAPP_TO` usando la Cloud API de Meta (ver `.env.template`). Sin esas variables no se manda nada y el pedido se registra igual; el panel de pedidos muestra si está conectado.
 
 **Datos del negocio.** El nombre, los teléfonos y los números de WhatsApp están en `src/config/store.ts`.
