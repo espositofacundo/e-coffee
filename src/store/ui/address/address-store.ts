@@ -16,6 +16,7 @@ export const useAddressStore = create<State>()(
         address: "",
         notes: "",
         paymentMethod: "efectivo",
+        zone: "",
       },
       setAddress: (address) => {
         set({ address });

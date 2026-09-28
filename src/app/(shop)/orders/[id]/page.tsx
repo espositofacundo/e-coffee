@@ -1,6 +1,7 @@
 export const revalidate = 0;
 
 import { getOrderById } from "@/actions/order/get-order-by-id";
+import { getStoreSettings } from "@/actions/settings/get-store-settings";
 import { auth } from "@/auth.config";
 import ProductImage from "@/components/product/product-image/productImage";
 import { OrderControls } from "@/components/orders/OrderControls";
@@ -16,6 +17,7 @@ import {
   paymentMethodLabel,
 } from "@/utils/order-status";
 import { presentationLabel } from "@/utils/presentation";
+import { shippingLabel, zoneLabel } from "@/utils/shipping";
 import { buildOrderMessage, whatsappLink } from "@/utils/whatsapp";
 import clsx from "clsx";
 import { redirect } from "next/navigation";
@@ -36,7 +38,11 @@ export const metadata = {
 };
 
 export default async function OrderPage({ params, searchParams }: Props) {
-  const [{ ok, order }, session] = await Promise.all([getOrderById(params.id), auth()]);
+  const [{ ok, order }, session, settings] = await Promise.all([
+    getOrderById(params.id),
+    auth(),
+    getStoreSettings(),
+  ]);
 
   if (!ok || !order) {
     redirect("/");
@@ -133,8 +139,14 @@ export default async function OrderPage({ params, searchParams }: Props) {
             </div>
           ))}
           <div className="flex justify-between px-4 py-3 text-sm">
+            <span>Subtotal</span>
+            <span>{currencyFormat(order.subtotal)}</span>
+          </div>
+          <div className="flex justify-between px-4 py-3 text-sm">
             <span>Envío</span>
-            <span className="font-semibold text-brand-green">Gratis</span>
+            <span className={clsx(order.shippingCost === 0 && "font-semibold text-brand-green")}>
+              {shippingLabel(order.shippingCost)}
+            </span>
           </div>
           <div className="flex justify-between px-4 py-3 text-xl font-bold">
             <span>Total</span>
@@ -149,6 +161,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
               <p className="font-semibold">{order.firstName}</p>
               <p>{order.address}</p>
               <p>{order.phone}</p>
+              <p className="text-gray-600">{zoneLabel(order.zone, settings)}</p>
               {order.notes && <p className="text-gray-600">{order.notes}</p>}
             </div>
             <div className="mt-3 pt-3 border-t border-brand-cream-dark flex items-center justify-between text-sm">

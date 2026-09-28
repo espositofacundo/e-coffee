@@ -39,6 +39,12 @@ enum PaymentMethod {
   transferencia
 }
 
+// Zona de entrega que elige el cliente: dentro del radio con envío sin cargo o fuera.
+enum DeliveryZone {
+  centro
+  fuera
+}
+
 model Category {
   id        String    @id @default(uuid())
   name      String    @unique
@@ -82,7 +88,13 @@ model StoreSetting {
   id              Int      @id @default(1)
   // Cuánto más caro es el ½ kg, en % del precio por kilo: ½ kg = kilo × (0,5 + 3,7 %).
   halfKgSurcharge Float    @default(3.7)
-  updatedAt       DateTime @updatedAt
+
+  // Envío: sin cargo dentro de esta zona o a partir de freeShippingFrom; si no, shippingCost.
+  freeZoneLabel    String @default("Juan B. Justo, Independencia, Libertad y la costa")
+  freeShippingFrom Float  @default(20000)
+  shippingCost     Float  @default(3000)
+
+  updatedAt DateTime @updatedAt
 }
 
 model ProductImage {
@@ -107,8 +119,11 @@ model Order {
   number Int    @unique @default(autoincrement())
 
   subtotal     Float
+  // Costo de envío cobrado en este pedido (0 = sin cargo). total = subtotal + shippingCost.
+  shippingCost Float       @default(0)
   total        Float
   itemsInOrder Int
+  zone         DeliveryZone @default(centro)
 
   status      OrderStatus @default(pendiente)
   preparingAt DateTime?

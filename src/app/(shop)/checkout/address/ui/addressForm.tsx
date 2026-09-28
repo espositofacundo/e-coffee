@@ -2,7 +2,9 @@
 
 import type { Address } from "@/interfaces/orders.interface";
 import { useAddressStore } from "@/store/ui/address/address-store";
+import { currencyFormat } from "@/utils/currency";
 import { paymentMethodLabel } from "@/utils/order-status";
+import { freeFromLabel, type ShippingSettings } from "@/utils/shipping";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -11,9 +13,10 @@ import { IoArrowForward } from "react-icons/io5";
 
 interface Props {
   lastAddress: Address | null;
+  settings: ShippingSettings;
 }
 
-export const AddressForm = ({ lastAddress }: Props) => {
+export const AddressForm = ({ lastAddress, settings }: Props) => {
   const router = useRouter();
   const setAddress = useAddressStore((state) => state.setAddress);
   const storedAddress = useAddressStore((state) => state.address);
@@ -31,6 +34,7 @@ export const AddressForm = ({ lastAddress }: Props) => {
       address: "",
       notes: "",
       paymentMethod: "efectivo",
+      zone: "",
     },
   });
 
@@ -50,6 +54,7 @@ export const AddressForm = ({ lastAddress }: Props) => {
   };
 
   const paymentMethod = watch("paymentMethod");
+  const zone = watch("zone");
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="card p-5 sm:p-6 space-y-4">
@@ -108,6 +113,46 @@ export const AddressForm = ({ lastAddress }: Props) => {
           {...register("notes")}
         />
       </div>
+
+      <fieldset>
+        <legend className="label">¿Dónde entregamos?</legend>
+        <div className="grid gap-2">
+          {(
+            [
+              {
+                value: "centro" as const,
+                title: `Dentro de ${settings.freeZoneLabel}`,
+                detail: "Envío sin cargo",
+              },
+              {
+                value: "fuera" as const,
+                title: "Fuera de esa zona",
+                detail: `${freeFromLabel(settings)}; si no, ${currencyFormat(settings.shippingCost)}`,
+              },
+            ]
+          ).map((option) => (
+            <label
+              key={option.value}
+              className={clsx(
+                "cursor-pointer rounded-lg border px-3 py-2.5 transition-colors",
+                zone === option.value
+                  ? "border-brand-green bg-brand-green-light"
+                  : "border-brand-cream-dark bg-white hover:border-brand-green"
+              )}
+            >
+              <input
+                type="radio"
+                value={option.value}
+                className="sr-only"
+                {...register("zone", { required: true })}
+              />
+              <span className="font-medium">{option.title}</span>
+              <span className="block text-sm text-gray-600">{option.detail}</span>
+            </label>
+          ))}
+        </div>
+        {errors.zone && <FieldError text="Elegí dónde entregamos el pedido" />}
+      </fieldset>
 
       <fieldset>
         <legend className="label">¿Cómo vas a pagar?</legend>

@@ -3,8 +3,10 @@
 import { auth } from "@/auth.config";
 import type { Address } from "@/interfaces/orders.interface";
 import type { Presentation } from "@/interfaces/product.interface";
+import { getStoreSettings } from "@/actions/settings/get-store-settings";
 import prisma from "@/lib/prisma";
 import { notifyNewOrder } from "@/lib/whatsapp-notify";
+import { shippingCostFor } from "@/utils/shipping";
 import { getPresentationPrice, presentationLabel } from "@/utils/presentation";
 import { stockByProduct } from "@/utils/stock";
 import { revalidatePath } from "next/cache";
@@ -34,6 +36,9 @@ const addressSchema = z.object({
   address: z.string().trim().min(3, "Falta la dirección"),
   notes: z.string().trim().default(""),
   paymentMethod: z.enum(["efectivo", "transferencia"]),
+  zone: z.enum(["centro", "fuera"], {
+    errorMap: () => ({ message: "Elegí la zona de entrega" }),
+  }),
 });
 
 export const placeOrder = async (
@@ -112,6 +117,10 @@ export const placeOrder = async (
     0
   );
 
+  // El costo de envío se calcula acá, nunca se toma del navegador.
+  const settings = await getStoreSettings();
+  const shippingCost = shippingCostFor(subtotal, delivery.zone, settings);
+
   try {
     // El pedido y el descuento de stock van juntos: o se hacen los dos o ninguno.
     // Solo se descuenta en productos con stock cargado; si no alcanza, queda en negativo.
@@ -120,9 +129,10 @@ export const placeOrder = async (
         data: {
           userId,
           subtotal,
-          // El envío es gratis: el total es el subtotal.
-          total: subtotal,
+          shippingCost,
+          total: subtotal + shippingCost,
           itemsInOrder,
+          zone: delivery.zone,
           firstName: delivery.firstName,
           phone: delivery.phone,
           address: delivery.address,

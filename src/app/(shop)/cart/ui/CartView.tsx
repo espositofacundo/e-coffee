@@ -5,11 +5,12 @@ import QuantitySelector from "@/components/product/quantity-selector/QuantitySel
 import { useCartStore } from "@/store/ui/cart/cart-store";
 import { currencyFormat } from "@/utils/currency";
 import { presentationLabel } from "@/utils/presentation";
+import type { ShippingSettings } from "@/utils/shipping";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { IoArrowForward, IoCartOutline, IoTrashOutline } from "react-icons/io5";
 
-const CartView = () => {
+const CartView = ({ settings }: { settings: ShippingSettings }) => {
   const [loaded, setLoaded] = useState(false);
   const cart = useCartStore((state) => state.cart);
   const updateProductQuantity = useCartStore((state) => state.updateProductQuantity);
@@ -102,13 +103,20 @@ const CartView = () => {
           </div>
           <div className="flex justify-between">
             <span>Envío</span>
-            <span className="font-semibold text-brand-green">Gratis</span>
+            <span className="text-gray-600">
+              {subTotal >= settings.freeShippingFrom ? "Sin cargo" : "Según la zona"}
+            </span>
           </div>
         </div>
         <div className="mt-3 pt-3 border-t border-brand-cream-dark flex justify-between text-xl font-bold">
           <span>Total</span>
           <span>{currencyFormat(total)}</span>
         </div>
+        <p className="mt-2 text-xs text-gray-500">
+          Envío sin cargo dentro de {settings.freeZoneLabel}, y en cualquier zona desde{" "}
+          {currencyFormat(settings.freeShippingFrom)}. Fuera de esa zona,{" "}
+          {currencyFormat(settings.shippingCost)}.
+        </p>
 
         <Link href="/checkout/address" className="btn-primary w-full mt-5 py-3">
           Continuar <IoArrowForward />

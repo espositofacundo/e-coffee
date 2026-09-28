@@ -1,4 +1,5 @@
 import { store } from "@/config/store";
+import type { DeliveryZone } from "@/interfaces/orders.interface";
 import { currencyFormat } from "@/utils/currency";
 import { formatOrderNumber } from "@/utils/order-status";
 
@@ -8,6 +9,8 @@ interface OrderNotice {
   firstName: string;
   phone: string;
   address: string;
+  zone: DeliveryZone;
+  shippingCost: number;
   total: number;
 }
 
@@ -41,8 +44,11 @@ export const notifyNewOrder = async (order: OrderNotice) => {
     formatOrderNumber(order.number),
     order.firstName,
     order.phone,
-    order.address,
-    currencyFormat(order.total),
+    // La zona ayuda a organizar el reparto sin abrir la web.
+    `${order.address} (${order.zone === "centro" ? "zona sin cargo" : "fuera de zona"})`,
+    order.shippingCost > 0
+      ? `${currencyFormat(order.total)} (incluye envío ${currencyFormat(order.shippingCost)})`
+      : currencyFormat(order.total),
     `${baseUrl}/orders/${order.id}`,
   ].map((value) => String(value).replace(/\s+/g, " ").trim());
 

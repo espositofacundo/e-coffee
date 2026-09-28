@@ -6,6 +6,12 @@ import { useCartStore } from "@/store/ui/cart/cart-store";
 import { useMyOrdersStore } from "@/store/ui/orders/my-orders-store";
 import { currencyFormat } from "@/utils/currency";
 import { paymentMethodLabel } from "@/utils/order-status";
+import {
+  shippingCostFor,
+  shippingLabel,
+  zoneLabel,
+  type ShippingSettings,
+} from "@/utils/shipping";
 import clsx from "clsx";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -13,7 +19,7 @@ import { useEffect, useState } from "react";
 import { GrEdit } from "react-icons/gr";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 
-const PlaceOrder = () => {
+const PlaceOrder = ({ settings }: { settings: ShippingSettings }) => {
   const router = useRouter();
   const [loaded, setLoaded] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,9 +29,13 @@ const PlaceOrder = () => {
   const cart = useCartStore((state) => state.cart);
   const clearCart = useCartStore((state) => state.clearCart);
   const addOrder = useMyOrdersStore((state) => state.addOrder);
-  const { itemsInCart, subTotal, total } = useCartStore((state) =>
+  const { itemsInCart, subTotal } = useCartStore((state) =>
     state.getSummaryInformation()
   );
+
+  // El envío depende de la zona que eligió; el servidor lo vuelve a calcular al confirmar.
+  const shipping = address.zone ? shippingCostFor(subTotal, address.zone, settings) : 0;
+  const total = subTotal + shipping;
 
   useEffect(() => {
     setLoaded(true);
@@ -34,8 +44,8 @@ const PlaceOrder = () => {
   useEffect(() => {
     if (!loaded || isPlacingOrder) return;
     if (itemsInCart === 0) router.replace("/cart");
-    else if (!address.address) router.replace("/checkout/address");
-  }, [loaded, isPlacingOrder, itemsInCart, address.address, router]);
+    else if (!address.address || !address.zone) router.replace("/checkout/address");
+  }, [loaded, isPlacingOrder, itemsInCart, address.address, address.zone, router]);
 
   const onPlaceOrder = async () => {
     setIsPlacingOrder(true);
@@ -75,6 +85,9 @@ const PlaceOrder = () => {
         <p className="font-semibold">{address.firstName}</p>
         <p>{address.address}</p>
         <p>{address.phone}</p>
+        {address.zone && (
+          <p className="text-gray-600">{zoneLabel(address.zone, settings)}</p>
+        )}
         {address.notes && <p className="text-gray-600">{address.notes}</p>}
         <p className="pt-1">
           <span className="text-gray-600">Pago:</span>{" "}
@@ -95,7 +108,9 @@ const PlaceOrder = () => {
         </div>
         <div className="flex justify-between">
           <span>Envío</span>
-          <span className="font-semibold text-brand-green">Gratis</span>
+          <span className={clsx(shipping === 0 && "font-semibold text-brand-green")}>
+            {shippingLabel(shipping)}
+          </span>
         </div>
       </div>
       <div className="mt-3 pt-3 border-t border-brand-cream-dark flex justify-between text-xl font-bold">

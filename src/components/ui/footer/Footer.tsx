@@ -48,7 +48,7 @@ export default function Footer() {
           <MdOutlineLocalShipping size={24} className="shrink-0" />
           <div>
             <p className="font-semibold">Envíos a domicilio</p>
-            <p className="text-sm text-white/80">El envío es gratis en todos los pedidos.</p>
+            <p className="text-sm text-white/80">Coordinamos la entrega por WhatsApp.</p>
           </div>
         </div>
       </div>

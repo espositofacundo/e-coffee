@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import type { IconType } from "react-icons";
 import {
+  IoBicycleOutline,
   IoCartOutline,
   IoCloseOutline,
   IoFileTrayFullOutline,
@@ -115,6 +116,7 @@ const Sidebar = () => {
             <SidebarLink href="/admin/orders" icon={IoFileTrayFullOutline} label="Pedidos" onClick={closeMenu} />
             <SidebarLink href="/admin/products" icon={IoPricetagsOutline} label="Productos y precios" onClick={closeMenu} />
             <SidebarLink href="/admin/categories" icon={IoListOutline} label="Categorías" onClick={closeMenu} />
+            <SidebarLink href="/admin/envios" icon={IoBicycleOutline} label="Envíos" onClick={closeMenu} />
             <SidebarLink href="/admin/users" icon={IoPeopleOutline} label="Usuarios" onClick={closeMenu} />
           </>
         )}

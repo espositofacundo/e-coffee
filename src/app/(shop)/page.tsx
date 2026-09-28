@@ -31,7 +31,7 @@ export default async function Home() {
           </p>
           <div className="mt-4 flex flex-wrap gap-2 text-sm">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1">
-              <MdOutlineLocalShipping size={18} /> Envío a domicilio gratis
+              <MdOutlineLocalShipping size={18} /> Envío a domicilio
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1">
               <IoLeafOutline size={16} /> Precios por ½ kg y por kilo

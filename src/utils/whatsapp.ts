@@ -3,9 +3,11 @@ import type { PaymentMethod } from "@/interfaces/orders.interface";
 import { currencyFormat } from "./currency";
 import { formatOrderNumber, paymentMethodLabel } from "./order-status";
 import { presentationLabel } from "./presentation";
+import { shippingLabel } from "./shipping";
 
 interface OrderForMessage {
   number: number;
+  shippingCost: number;
   total: number;
   firstName: string;
   phone: string;
@@ -31,7 +33,8 @@ export const buildOrderMessage = (order: OrderForMessage) => {
   return [
     `¡Hola! Hice el pedido ${formatOrderNumber(order.number)} en la web:`,
     ...items,
-    `Total: ${currencyFormat(order.total)} (envío gratis)`,
+    `Envío: ${shippingLabel(order.shippingCost)}`,
+    `Total: ${currencyFormat(order.total)}`,
     "",
     `Entrega: ${order.firstName} - ${order.address}`,
     `Tel: ${order.phone}`,

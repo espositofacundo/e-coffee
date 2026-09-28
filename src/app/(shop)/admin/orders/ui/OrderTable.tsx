@@ -75,13 +75,23 @@ const OrderTable = ({ orders }: Props) => {
                 <p className="font-semibold">
                   {order.firstName} · <a href={`tel:${order.phone}`} className="font-normal underline">{order.phone}</a>
                 </p>
-                <p className="truncate">{order.address}</p>
+                <p className="truncate">
+                  {order.address}
+                  {order.zone === "fuera" && (
+                    <span className="ml-2 rounded bg-brand-gold-light px-1.5 py-0.5 text-xs font-semibold text-brand-gold-dark">
+                      fuera de zona
+                    </span>
+                  )}
+                </p>
                 {order.notes && <p className="truncate text-gray-500">{order.notes}</p>}
               </div>
 
               <div className="text-sm">
                 <p className="font-bold text-base">{currencyFormat(order.total)}</p>
-                <p className="text-gray-500">{paymentMethodLabel[order.paymentMethod]}</p>
+                <p className="text-gray-500">
+                  {paymentMethodLabel[order.paymentMethod]}
+                  {order.shippingCost > 0 && ` · envío ${currencyFormat(order.shippingCost)}`}
+                </p>
               </div>
 
               <OrderControls

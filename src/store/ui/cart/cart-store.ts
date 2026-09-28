@@ -45,7 +45,7 @@ export const useCartStore = create<State>()(
         );
         const itemsInCart = cart.reduce((total, item) => total + item.quantity, 0);
 
-        // El envío es gratis: el total es el subtotal.
+        // El envío se coordina aparte: el total es el subtotal.
         return { subTotal, total: subTotal, itemsInCart };
       },
 

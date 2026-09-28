@@ -18,6 +18,7 @@ export const getLastAddress = async (): Promise<Address | null> => {
       address: true,
       notes: true,
       paymentMethod: true,
+      zone: true,
     },
   });
   if (!lastOrder) return null;
